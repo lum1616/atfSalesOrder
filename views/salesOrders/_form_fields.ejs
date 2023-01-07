@@ -1,0 +1,46 @@
+<div class="form-row">
+  <div class="form-item">
+    <label>Date</label>
+    <input type="date" name="date" value="<%= salesOrder.date == null ? '' : salesOrder.date.toISOString().split('T')[0] %>">
+  </div>
+  <div class="form-item">
+    <label>Customer</label>
+    <select name="customer">
+      <% customers.forEach(customer => { %>        
+        <option label="<%= customer.name %>" value="<%= customer.id %>">       
+      <% }) %>    
+    </select>    
+  </div>
+  <div class="form-item">
+    <label>Drawing Number</label>
+    <input type="text" name="drawingNo" value="<%= salesOrder.drawingNo %>">
+  </div>
+</div>
+<div class="form-row">
+  <div class="form-item">
+    <label>SalesOrder Number</label>
+    <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+  </div>
+  <div class="form-item">
+    <label>PO Number</label>
+    <input type="text" name="poNumber" value="<%= salesOrder.poNumber %> ">
+  </div>
+</div>
+
+<div class="form-item">
+  <div class="form-item">
+    <label>Quantity</label>
+    <input type="number" name="orderQty" value="<%= salesOrder.orderQty %>">
+  </div> 
+  <div class="form-item">
+    <label>Unit Price</label>
+    <input type="number" name="unitPrice" value="<%= salesOrder.unitPrice %>">
+  </div> 
+  
+</div>
+<div class="form-row">
+  <div class="form-item form-item-no-grow">
+    <label>Cover</label>
+    <input type="file" name="cover" class="salesOrder-cover filepond">
+  </div> 
+</div>

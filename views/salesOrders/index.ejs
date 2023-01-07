@@ -1,0 +1,29 @@
+<h2 class="page-header">Search Book</h2>
+<form action="/salesOrders" method="GET">
+  <div class="form-row">
+    <div class="form-item">
+      <label>Title</label>
+      <input type="text" name="title" >
+    </div>
+  </div> 
+  <div class="form-row form-row-end">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </div>
+</form>
+<% salesOrders.forEach(salesOrder => { %>
+  <div class="customer-row">  
+    <div class="customer-name"><%= salesOrder.orderNumber %></div>
+    <br>
+    <div class="btn-row">
+     
+      <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>">View</a>
+      <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
+      <%- include('../partials/deleteForm',
+                  { url: `/salesOrders/${salesOrder.id}` }) %>
+    </div>
+  </div>
+<% }) %>
+
+<br>
+<a class="btn btn-danger" href="/salesOrders/new">New</a>
+<%- include('../partials/orderGrid', { salesOrders: salesOrders, large: true }) %>

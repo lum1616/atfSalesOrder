@@ -1,0 +1,9 @@
+.customer-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.customer-name {
+  font-size: 1.5rem;
+}

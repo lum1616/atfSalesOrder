@@ -1,0 +1,6 @@
+<h2 class="page-header"><%= salesOrder.orderNumber %></h2>
+<div class="btn-row">
+  <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
+  <%- include('../partials/deleteForm',
+              { url: `/salesOrders/${salesOrder.id}` }) %>
+</div>

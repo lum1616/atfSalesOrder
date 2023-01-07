@@ -1,0 +1,9 @@
+<% salesOrderCoverClass = locals.large ? 'salesOrder-cover-large' : '' %>
+<% salesOrderGridClass = locals.large ? 'salesOrder-grid-large' : '' %>
+<div class="salesOrder-grid <%= salesOrderGridClass %>">
+  <% salesOrders.forEach(salesOrder => { %>
+    <a href="/salesOrders/<%= salesOrder.id %>">
+      <img class="salesOrder-cover <%= salesOrderCoverClass %>" src="<%= salesOrder.coverImagePath %>">
+    </a>
+  <% }) %>
+</div>
