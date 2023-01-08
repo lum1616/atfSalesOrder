@@ -4,3 +4,12 @@
   <%- include('../partials/deleteForm',
               { url: `/salesOrders/${salesOrder.id}` }) %>
 </div>
+<div>
+  <img class="salesOrder-cover" src="<%= salesOrder.partImagePath %>">
+  <div class="salesOrder-details-btn-grid">
+    <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
+    <%- include('../partials/deleteForm',
+    { url: `/salesOrders/${salesOrder.id}` }) %>
+   
+  </div>
+</div>

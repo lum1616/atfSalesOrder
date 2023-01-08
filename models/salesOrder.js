@@ -46,4 +46,11 @@ const salesOrderSchema = new mongoose.Schema({
   }
 })
 
+salesOrderSchema.virtual('partImagePath').get(function() {
+  if (this.partImage != null && this.partImageType != null) {
+    return `data:${this.partImageType};charset=utf-8;base64,${this.partImage.toString('base64')}`
+  }
+})
+
+
 module.exports = mongoose.model('SalesOrder', salesOrderSchema)

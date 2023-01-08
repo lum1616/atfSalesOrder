@@ -5,7 +5,7 @@ const Customer = require('../models/customer')
 const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif']
 
 
-// All SaleOrders Route
+// All SalesOrders Route
 router.get('/', async (req, res) => {
   let query = SalesOrder.find() 
   try {
@@ -19,16 +19,17 @@ router.get('/', async (req, res) => {
   }
 })
 
-// New SaleOrders Route
+// New SalesOrders Route
 router.get('/new', async (req, res) => {
     renderNewPage(res, new SalesOrder())
 })
 
-// Create SaleOrders Route
+// Create SalesOrders Route
 router.post('/', async (req, res) => {
   const salesOrder = new SalesOrder({
     date: new Date(req.body.date),
     orderNumber: req.body.orderNumber,
+    drawingNo : req.body.drawingNo,
     poNumber: req.body.poNumber,   
     orderQty: req.body.orderQty,
     orderQty: req.body.orderQty,
@@ -37,7 +38,7 @@ router.post('/', async (req, res) => {
     unitPrice: req.body.unitPrice,
     customer: req.body.customer
   })
-  //saveCover(salesOrder, req.body.cover)
+  saveCover(salesOrder, req.body.cover)
 
   try {
     const newSalesOrder = await salesOrder.save()
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-// Show SaleOrder Route
+// Show SalesOrder Route
 router.get('/:id', async (req, res) => {
 
   try {
@@ -76,15 +77,18 @@ router.put('/:id', async (req, res) => {
   try {
     salesOrder = await SalesOrder.findById(req.params.id)
     salesOrder.orderQty = req.body.orderQty
+    salesOrder.orderNumber =req.body.orderNumber
+    salesOrder.orderNumber = req.body.orderNumber,
+    salesOrder.drawingNo = req.body.drawingNo,
     salesOrder.deliverQty = req.body.deliverQty
     salesOrder.date = new Date(req.body.date)
     salesOrder.drawingNo = req.body.drawingNo
     salesOrder.poNumber = req.body.poNumber
     salesOrder.description = req.body.description
     if (req.body.cover != null && req.body.cover !== '') {
-      //saveCover(saleOrder, req.body.cover)
+      
+      saveCover(salesOrder, req.body.cover)
     }
-    console.log(salesOrder);
     await salesOrder.save()
     res.redirect(`/salesOrders/${salesOrder.id}`)
   } catch {
@@ -98,13 +102,13 @@ router.put('/:id', async (req, res) => {
 
 // Delete SalesOrder Page
 router.delete('/:id', async (req, res) => {
-  let saleOrder
+  let salesOrder
   try {
-    saleOrder = await SaleOrder.findById(req.params.id)
-    await saleOrder.remove()
+    salesOrder = await SalesOrder.findById(req.params.id)
+    await salesOrder.remove()
     res.redirect('/salesOrders')
   } catch {
-    if (saleOrder != null) {
+    if (salesOrder != null) {
       res.render('salesOrders/show', {
         salesOrder: salesOrder,
         errorMessage: 'Could not remove salesOrder'
@@ -144,12 +148,14 @@ async function renderFormPage(res, salesOrder, form, hasError = false) {
   }
 }
 
-function saveCover(saleOrder, coverEncoded) {
+function saveCover(salesOrder, coverEncoded) {
   if (coverEncoded == null) return
+  
   const cover = JSON.parse(coverEncoded)
   if (cover != null && imageMimeTypes.includes(cover.type)) {
-    saleOrder.coverImage = new Buffer.from(cover.data, 'base64')
-    saleOrder.coverImageType = cover.type
+    console.log("cover type=  " + cover.type);
+    salesOrder.partImage = new Buffer.from(cover.data, 'base64')
+    salesOrder.partImageType = cover.type
   }
 }
 
