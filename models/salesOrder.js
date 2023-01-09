@@ -24,7 +24,7 @@ const salesOrderSchema = new mongoose.Schema({
   customer: { 
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'Customer'
+    ref: 'customer'
   },
   drawingNo: {
     type: String    

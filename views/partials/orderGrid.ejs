@@ -3,7 +3,7 @@
 <div class="salesOrder-grid <%= salesOrderGridClass %>">
   <% salesOrders.forEach(salesOrder => { %>
     <a href="/salesOrders/<%= salesOrder.id %>">
-      <img class="salesOrder-cover <%= salesOrderCoverClass %>" src="<%= salesOrder.coverImagePath %>">
+      <img class="salesOrder-cover <%= salesOrderCoverClass %>" src="<%= salesOrder.partImagePath %>">
     </a>
   <% }) %>
 </div>

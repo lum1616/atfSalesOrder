@@ -1,4 +1,7 @@
 <h2 class="page-header"><%= customer.name %></h2>
+<div>
+  <%- include('_form_fields') %>
+</div> 
 <div class="btn-row">
   <a class="btn btn-primary" href="/customers/<%= customer.id %>/edit">Edit</a>
   <%- include('../partials/deleteForm',

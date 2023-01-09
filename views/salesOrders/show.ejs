@@ -1,15 +1,54 @@
-<h2 class="page-header"><%= salesOrder.orderNumber %></h2>
-<div class="btn-row">
-  <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
-  <%- include('../partials/deleteForm',
-              { url: `/salesOrders/${salesOrder.id}` }) %>
-</div>
-<div>
-  <img class="salesOrder-cover" src="<%= salesOrder.partImagePath %>">
-  <div class="salesOrder-details-btn-grid">
-    <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
-    <%- include('../partials/deleteForm',
-    { url: `/salesOrders/${salesOrder.id}` }) %>
-   
+<style>
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right:10px;
+    width: 50%;
+    padding: 10px;
+  }
+</style>
+<form action="">
+<div class="form-row">
+  <div class="form-item">
+    <label>Date</label>
+    <input type="date" value="<%= salesOrder.date == null ? '' : salesOrder.date.toISOString().split('T')[0] %>">
+  </div>
+  <div class="form-item">
+    <label>Customer</label>
+    <input type="text" value="<%= customer.name %>">
+  </div>     
+  <div class="form-item">
+    <label>Drawing Number</label>
+    <input type="text" value="<%= salesOrder.drawingNo %>">
+  </div>
+  <div class="form-item">
+    <label>SalesOrder Number</label>
+    <input type="text" value="<%= salesOrder.orderNumber %> " >
   </div>
 </div>
+<div class="form-row"> 
+  <div class="form-item">
+     <label>PO Number</label>
+     <input type="text" value="<%= salesOrder.poNumber %> ">
+  </div>
+  <div class="form-item">
+    <label>Quantity</label>
+    <input type="number" value="<%= salesOrder.orderQty %>">
+  </div> 
+  <div class="form-item">
+    <label>Unit Price (RM)</label>
+    <input type="number"  value="<%= salesOrder.unitPrice %>">
+  </div> 
+</div>
+<div>
+  <div class="btn-row">
+    <img src="<%= salesOrder.partImagePath %>" >
+    <div style="margin:auto;">
+      <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
+    </div> 
+    <div style="margin:auto;">
+      <%- include('../partials/deleteForm',
+      { url: `/salesOrders/${salesOrder.id}` }) %> 
+    </div>
+  </div>
+</form>

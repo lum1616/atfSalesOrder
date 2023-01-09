@@ -50,12 +50,15 @@ router.post('/', async (req, res) => {
 
 // Show SalesOrder Route
 router.get('/:id', async (req, res) => {
-
   try {
     const salesOrder = await SalesOrder.findById(req.params.id).exec()
-    res.render('salesOrders/show', { salesOrder: salesOrder })     
+    console.log(salesOrder.customer);
+    const customer = await Customer.findById(salesOrder.customer.toString()).exec()
+    console.log(customer.name);
+    res.render('salesOrders/show', { salesOrder: salesOrder, customer:customer })     
 
   } catch {
+    console.log("errrre");
     res.redirect('/')
   }
 })
@@ -85,6 +88,7 @@ router.put('/:id', async (req, res) => {
     salesOrder.drawingNo = req.body.drawingNo
     salesOrder.poNumber = req.body.poNumber
     salesOrder.description = req.body.description
+    salesOrder.customer= req.body.customer
     if (req.body.cover != null && req.body.cover !== '') {
       
       saveCover(salesOrder, req.body.cover)

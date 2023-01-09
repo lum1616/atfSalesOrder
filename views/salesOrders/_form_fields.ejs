@@ -5,10 +5,14 @@
   </div>
   <div class="form-item">
     <label>Customer</label>
-    <select name="customer">
+    <select name="customer">  
       <% customers.forEach(customer => { %>        
-        <option label="<%= customer.name %>" value="<%= customer.id %>">       
-      <% }) %>    
+        <% if (customer.id.toString() === salesOrder.customer.toString()) { %>
+          <option selected label="<%= customer.name %>" value="<%= customer.id %>"></option>
+        <% } else { %>
+         <option label="<%= customer.name %>" value="<%= customer.id %>"></option>
+        <% } %>
+      <% }) %> 
     </select>    
   </div>
   <div class="form-item">
@@ -35,10 +39,9 @@
     <input type="number" name="unitPrice" value="<%= salesOrder.unitPrice %>">
   </div> 
 </div>
-
 <div class="form-row">
   <div class="form-item form-item-no-grow">
-    <label>Cover</label>
+    <label>Photo</label>
     <input type="file" name="cover" class="salesOrder-cover filepond">
   </div> 
 </div>
