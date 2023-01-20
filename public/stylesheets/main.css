@@ -5,6 +5,8 @@
 @import 'shared/form.css';
 @import 'shared/customer.css';
 @import 'shared/salesOrder.css';
+@import 'shared/table.css';
+
 
 :root {
   font-family: 'Gotham Rounded';

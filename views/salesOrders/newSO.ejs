@@ -1,0 +1,37 @@
+<h2 class="page-header">New SalesOrder</h2>
+<form action="/salesOrders" method="POST">
+  <div class="form-row">
+    <div class="form-item">
+      <label>Date</label>
+      <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+    </div>
+    <div class="form-item">
+      <label>Customer</label>
+      <select name="customer">  
+        <% customers.forEach(customer => { %>        
+          <% if (String(customer.id) === String(salesOrder.customer)) { %>
+            <option selected label="<%= customer.name %>" value="<%= customer.id %>"></option>
+          <% } else { %>
+           <option label="<%= customer.name %>" value="<%= customer.id %>"></option>
+          <% } %>
+        <% }) %> 
+      </select>    
+    </div>    
+    <div class="form-item">
+      <label>PO Number</label>
+      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %> ">
+   </div>
+    <div class="form-item">
+      <label>SalesOrder Number</label>
+      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+    </div>
+  </div>
+  
+
+
+
+  <div class="form-row form-row-end btn-row">
+    <a class="btn btn-danger" href="/salesOrders">Cancel</a>
+    <button class="btn btn-primary" type="submit">Create</button>
+  </div>
+</form>

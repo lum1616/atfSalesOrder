@@ -2,11 +2,13 @@ const express = require('express')
 const router = express.Router()
 const SalesOrder = require('../models/salesOrder')
 const Customer = require('../models/customer')
+const { Mongoose } = require('mongoose')
 const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif']
 
 
 // All SalesOrders Route
 router.get('/', async (req, res) => {
+
   let query = SalesOrder.find() 
   try {
     const salesOrders = await query.exec()
@@ -20,86 +22,112 @@ router.get('/', async (req, res) => {
 })
 
 // New SalesOrders Route
-router.get('/new', async (req, res) => {
-    renderNewPage(res, new SalesOrder())
+router.get('/newSO', async (req, res) => {
+
+  const customers = await Customer.find({}) 
+  const params = {
+    customers: customers,
+    salesOrder: new SalesOrder()     
+  }
+  res.render(`salesOrders/newSO`, params)
+  //  renderNewPage(res, new SalesOrder())
 })
 
 // Create SalesOrders Route
 router.post('/', async (req, res) => {
   const salesOrder = new SalesOrder({
     date: new Date(req.body.date),
-    orderNumber: req.body.orderNumber,
-    drawingNo : req.body.drawingNo,
-    poNumber: req.body.poNumber,   
-    orderQty: req.body.orderQty,
-    orderQty: req.body.orderQty,
-    deliverQty: req.body.deliverQty,
-    orderQty: req.body.orderQty,
-    unitPrice: req.body.unitPrice,
+    orderNumber: req.body.orderNumber, 
+    poNumber: req.body.poNumber, 
     customer: req.body.customer
   })
-  saveCover(salesOrder, req.body.cover)
-
+  // saveCover(salesOrder, req.body.cover)
   try {
     const newSalesOrder = await salesOrder.save()
     res.redirect(`salesOrders/${newSalesOrder.id}`)
-  } catch {    
+  } catch {   
     renderNewPage(res, salesOrder, true)
   }
 })
 
 // Show SalesOrder Route
 router.get('/:id', async (req, res) => {
-  try {
-    const salesOrder = await SalesOrder.findById(req.params.id).exec()
-    console.log(salesOrder.customer);
+  let query = SalesOrder.find() 
+
+  try {    
+    const salesOrder = await SalesOrder.findById(req.params.id).exec() 
+    const salesOrders = await query.exec()   
     const customer = await Customer.findById(salesOrder.customer.toString()).exec()
-    console.log(customer.name);
-    res.render('salesOrders/show', { salesOrder: salesOrder, customer:customer })     
+
+    res.render('salesOrders/show', { salesOrder: salesOrder,
+                                    salesOrders: salesOrders,
+                                      customer:customer })     
 
   } catch {
-    console.log("errrre");
+   
     res.redirect('/')
   }
 })
 
-// Edit SalesOrder Route
+// Edit SalesOrder Part Route
 router.get('/:id/edit', async (req, res) => {
   try {
     const salesOrder = await SalesOrder.findById(req.params.id)
-    renderEditPage(res, salesOrder)
+    const customer = await Customer.findById(salesOrder.customer.toString()).exec()
+    renderEditPage(res, salesOrder, customer, "Edit" )
   } catch {
     res.redirect('/')
   }
 })
 
-// Update SalesOrder Route
+// Edit SalesOrder Part Route
+router.get('/:id/add', async (req, res) => {
+  try {
+    const salesOrder = await SalesOrder.findById(req.params.id)
+    const customer = await Customer.findById(salesOrder.customer.toString()).exec()
+    renderAddPage(res, salesOrder, customer, "Add" )
+  } catch {
+    res.redirect('/')
+  }
+})
+
+// update (save) SalesOrder Part Route
 router.put('/:id', async (req, res) => {
   let salesOrder
 
-  try {
-    salesOrder = await SalesOrder.findById(req.params.id)
-    salesOrder.orderQty = req.body.orderQty
-    salesOrder.orderNumber =req.body.orderNumber
-    salesOrder.orderNumber = req.body.orderNumber,
-    salesOrder.drawingNo = req.body.drawingNo,
-    salesOrder.deliverQty = req.body.deliverQty
-    salesOrder.date = new Date(req.body.date)
-    salesOrder.drawingNo = req.body.drawingNo
-    salesOrder.poNumber = req.body.poNumber
-    salesOrder.description = req.body.description
-    salesOrder.customer= req.body.customer
-    if (req.body.cover != null && req.body.cover !== '') {
-      
-      saveCover(salesOrder, req.body.cover)
+  try { 
+    if (req.body.button === "Add"){
+
+     salesOrder = new SalesOrder({
+      date : new Date(req.body.date),
+      orderNumber : req.body.orderNumber,
+      poNumber : req.body.poNumber,
+      customer : req.body.customerId      
+     }) 
+     console.log(' hgh'+salesOrder);
+
     }
+
+    if (req.body.button === "Edit")
+    {  
+      salesOrder = await SalesOrder.findById(req.body.soId)
+    }     
+    
+    salesOrder.orderQty = Number(req.body.orderQty)
+    salesOrder.unitPrice = Number(req.body.unitPrice)
+    salesOrder.drawingNo = req.body.drawingNo
+    salesOrder.description = req.body.description  
+    
     await salesOrder.save()
+    
     res.redirect(`/salesOrders/${salesOrder.id}`)
   } catch {
     if (salesOrder != null) {
+      console.log("1");
       renderEditPage(res, salesOrder, true)
     } else {
-      redirect('/')
+      console.log("2");
+      res.redirect('/')
     }
   }
 })
@@ -107,47 +135,53 @@ router.put('/:id', async (req, res) => {
 // Delete SalesOrder Page
 router.delete('/:id', async (req, res) => {
   let salesOrder
-  try {
+  try {    
     salesOrder = await SalesOrder.findById(req.params.id)
     await salesOrder.remove()
     res.redirect('/salesOrders')
   } catch {
-    if (salesOrder != null) {
+    if (salesOrder != null) {      
       res.render('salesOrders/show', {
         salesOrder: salesOrder,
         errorMessage: 'Could not remove salesOrder'
       })
-    } else {
+    } else {     
       res.redirect('/')
     }
   }
 })
 
-async function renderNewPage(res, salesOrder, hasError = false) {
-  renderFormPage(res, salesOrder, 'new', hasError)
+async function renderAddPage(res, salesOrder, hasError = false) {
+  renderFormPage(res, salesOrder, 'Add', hasError)
 }
 
 async function renderEditPage(res, salesOrder, hasError = false) {
-  renderFormPage(res, salesOrder, 'edit', hasError)
+
+  
+  renderFormPage(res, salesOrder, 'Edit', hasError)
 }
 
 async function renderFormPage(res, salesOrder, form, hasError = false) {
   try {   
-    const customers = await Customer.find({})
+    const customers = await Customer.find({})    
     const params = {
       customers: customers,
-      salesOrder: salesOrder
-    }
-    if (hasError) {
-      if (form === 'edit') {
+      salesOrder: salesOrder,
+      form : form      
+    }    
+   
+    /* if (hasError) {
+      if (form === 'edit') {   
         params.errorMessage = 'Error Updating SalesOrder'
       } else {
         params.errorMessage = 'Error Creating SalesOrder'
       }
-    }
-    res.render(`salesOrders/${form}`, params)
+    } */
+    //res.render(`salesOrders/${form}`, params)
+    res.render(`salesOrders/editPart`, params)
+ 
   } catch {
-    console.log("error enter rendernewpage");
+    
     res.redirect('/salesOrders')
   }
 }
@@ -157,9 +191,9 @@ function saveCover(salesOrder, coverEncoded) {
   
   const cover = JSON.parse(coverEncoded)
   if (cover != null && imageMimeTypes.includes(cover.type)) {
-    console.log("cover type=  " + cover.type);
-    salesOrder.partImage = new Buffer.from(cover.data, 'base64')
-    salesOrder.partImageType = cover.type
+    
+    part.partImage = new Buffer.from(cover.data, 'base64')
+    part.partImageType = cover.type
   }
 }
 

@@ -7,7 +7,7 @@
     <label>Customer</label>
     <select name="customer">  
       <% customers.forEach(customer => { %>        
-        <% if (customer.id.toString() === salesOrder.customer.toString()) { %>
+        <% if (String(customer.id) === String(salesOrder.customer)) { %>
           <option selected label="<%= customer.name %>" value="<%= customer.id %>"></option>
         <% } else { %>
          <option label="<%= customer.name %>" value="<%= customer.id %>"></option>

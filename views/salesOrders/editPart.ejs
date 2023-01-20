@@ -1,0 +1,89 @@
+<style>
+  img {
+    display: block;
+    margin-left: auto;
+    margin-right:10px;
+    width: 50%;
+    padding: 10px;
+  }
+</style>
+
+<h2 class="page-header"><%= form %> Part</h2>
+
+<form action="/salesOrders/<%= salesOrder.id %>?_method=PUT" method="POST">
+ 
+  <div class="form-row">
+
+    <div class="form-item">
+      <label>Date</label>
+      <input type="date" name="date" value="<%= salesOrder.date == null ? '' : salesOrder.date.toISOString().split('T')[0] %>" readonly>
+    </div>
+
+    <div class="form-item">
+      <label>Customer</label>
+      <% customers.forEach(customer => { %>        
+        <% if (String(customer.id) === String(salesOrder.customer)) { %>
+          <input type="text" name="customer" value="<%= customer.name %>" readonly>
+          <input type="hidden"  name="customerId" value="<%= salesOrder.customer %>">
+          <input type="hidden"  name="soId" value="<%= salesOrder._id %>">
+        <% } %> 
+      <% }) %>      
+    </div>  
+
+    <div class="form-item">
+      <label>PO Number</label>
+      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %>" readonly>
+    </div>
+
+    <div class="form-item">
+      <label>SO Number</label>
+      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+    </div>
+
+  </div>
+
+  <div class="form-row"> 
+
+    <div class="form-item">
+      <label>Drawing Number</label>
+      <input type="text" name="drawingNo" value="<%= salesOrder.drawingNo %> " >
+    </div>
+
+    <div class="form-item">
+      <label>Quantity</label> 
+      <input type="number" name="orderQty" value="<%= salesOrder.orderQty %>">
+    </div>
+
+    <div class="form-item">
+      <label>Unit Price (RM)</label>
+      <input type="number" name="unitPrice" value="<%= salesOrder.unitPrice %>">
+    </div>
+    
+
+  </div>  
+
+  <div class="form-row"> 
+    <div class="form-item">
+      <label>Description</label>
+      <input type="text" name="description" value="<%= salesOrder.description %> "   >
+    </div> 
+  </div>
+
+  <div  class="btn-row">
+    <img src="<%= salesOrder.partImagePath %>" >
+    <button class="btn btn-primary" name="button" value="<%=form%>" type="submit"> Save </button>
+  </div>
+
+</form>
+
+<%- include('../partials/deleteForm',
+        { url: `/salesOrders/${salesOrder.id}` }) %> 
+
+
+  
+
+
+
+
+
+

@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 
+
 const salesOrderSchema = new mongoose.Schema({
+
   date: {
-    type: Date,
-    required: true,
+    type: Date,   
     default: Date.now
   },
   orderNumber: {
@@ -11,40 +12,46 @@ const salesOrderSchema = new mongoose.Schema({
   },
   poNumber: {
     type: String   
+  },  
+
+  customer: { 
+    type: mongoose.Schema.Types.ObjectId,    
+    ref: 'customer'
   },
+  
   orderQty: {
     type: Number
   },
+
   deliverQty: {
     type: Number   
   },
+
   unitPrice: {
     type: Number    
-  },
-  customer: { 
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'customer'
-  },
+    },
   drawingNo: {
     type: String    
-  },
+    },
   prodType: {
     type: String    
-  },
+    },
   description: {
     type: String    
-  },
+    },
   status: {
     type: String    
-  },
-  partImage: {
-    type: Buffer    
-  },
-  partImageType: {
-    type: String    
-  }
+    },
+
+  reference: { 
+    type: mongoose.Schema.Types.ObjectId,   
+    ref: 'photo'
+    },
+      
+
+
 })
+
 
 salesOrderSchema.virtual('partImagePath').get(function() {
   if (this.partImage != null && this.partImageType != null) {

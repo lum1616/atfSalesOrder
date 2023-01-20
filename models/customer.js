@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-//const Book = require('./salesOrder')
+
 
 const customerSchema = new mongoose.Schema({
   name: {

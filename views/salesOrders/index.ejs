@@ -1,21 +1,34 @@
 <h2 class="page-header" >SalesOrder List</h2>
 <div class="form-row">
-  <a class="btn btn-danger" href="/salesOrders/new">Creat New SalesOrder</a>
+  <a class="btn btn-danger" href="/salesOrders/newSO">Create New SO</a>
 </div>
-<% salesOrders.forEach(salesOrder => { %>
-  <div class="customer-row">  
-    <div class="customer-name"><%= salesOrder.orderNumber %></div>
-    <div style="margin-right:100px;">
-      <a href="/salesOrders/<%= salesOrder.id %>">
-         <img src="<%= salesOrder.partImagePath %>" width="100" height="100">
-      </a>
-    </div>
-    <div class="btn-row">     
-      <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>">View</a>
-      <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a>
-      <%- include('../partials/deleteForm',
-                  { url: `/salesOrders/${salesOrder.id}` }) %>
-    </div>
-  </div>
-<% }) %>
-<!-- <%- include('../partials/orderGrid', { salesOrders: salesOrders, large: false }) %> -->
+
+<% let sos =[] %>
+<form  action="/salesOrders">  
+  <% salesOrders.forEach(salesOrder => { %>
+    <% let position = sos.indexOf(salesOrder.orderNumber.trim())  %>
+    <% if (position < 0) {%>
+      <% sos.push((salesOrder.orderNumber).trim()) %>
+      <div class="customer-row">  
+          <div class="customer-name">
+            <%= salesOrder.orderNumber %>
+          </div>
+           <!-- 
+            <div style="margin-right:100px;">
+              <a href="/salesOrders/<%= salesOrder.id %>">
+                 <img src="<%= salesOrder.partImagePath %>" width="100" height="100">               
+              </a>
+            </div> -->
+
+          <div class="btn-row">     
+            <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>">View</a>
+            <!-- <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a> -->
+            <%- include('../partials/deleteForm',
+                        { url: `/salesOrders/${salesOrder.id}` }) %>
+          </div>
+        </div>
+    <% }%>  
+  <% }) %> 
+  
+</form>
+
