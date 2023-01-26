@@ -1,0 +1,21 @@
+<h2 class="page-header">DO List</h2>
+<div class="form-row">
+   <a class="btn btn-danger" href="/dos/newDO">Create New DO</a>
+</div>
+<br>
+
+<% let doList =[] %>
+<% dos.forEach( ddo => { %>
+  <% let position = doList.indexOf((ddo.doNo).trim())  %>
+  <% if (position < 0) {%>
+    <% doList.push((ddo.doNo).trim()) %> 
+    <div class="customer-row">
+     <div class="customer-name"><%= ddo.doNo %></div>        
+     <div class="btn-row">
+     <a class="btn btn-primary" href="/dos/<%= ddo.id %>">View</a>
+     <%- include('../partials/deleteForm',
+                  { url: `/dos/${ddo.id}` }) %>
+     </div>
+    </div>
+  <% }%>  
+<% }) %>

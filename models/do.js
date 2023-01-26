@@ -5,24 +5,21 @@ const doSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  doNo: {
-    type: String,
+  doNo: {type: String},
+  issuer: {type: String},
+  receiver: { type: String },
+  status: {type: String},  
+  soNumber : {type :String}, 
+  drawingNo : {type :String}, 
+  poNumber : {type :String}, 
+  unitPrice : {type :Number}, 
+  orderQty : {type :Number}, 
+  deliverQty : {type :Number}, 
+   
+  customer: { 
+    type: mongoose.Schema.Types.ObjectId,    
+    ref: 'customer'
   },
-  salesOrderNo: {
-    type: String,
-  },
-  qty: {
-    type: Number,
-  },
-  issuer: {
-    type: String,
-  },
-  receiver: {
-    type: String,
-  },
-  status: {
-    type: String,
-  }
 })
 
 

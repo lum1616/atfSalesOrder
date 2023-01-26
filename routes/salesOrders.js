@@ -104,7 +104,7 @@ router.put('/:id', async (req, res) => {
       poNumber : req.body.poNumber,
       customer : req.body.customerId      
      }) 
-     console.log(' hgh'+salesOrder);
+     
 
     }
 

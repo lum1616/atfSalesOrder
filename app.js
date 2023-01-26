@@ -11,6 +11,8 @@ if (process.env.NODE_ENV !== 'production') {
   const indexRouter = require('./routes/index')
   const customerRouter = require('./routes/customers')
   const salesOrderRouter = require('./routes/salesOrders')
+  const doRouter = require('./routes/dos')
+  
   
   app.set('view engine', 'ejs')
   app.set('views', __dirname + '/views')
@@ -29,5 +31,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.use('/', indexRouter)
   app.use('/customers', customerRouter)
   app.use('/salesOrders', salesOrderRouter)
+  app.use('/dos', doRouter)
+  
   
   app.listen(process.env.PORT || 3000)

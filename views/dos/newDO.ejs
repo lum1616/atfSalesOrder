@@ -1,0 +1,33 @@
+<h2 class="page-header">New DO</h2>
+
+<form action="/dos" method="POST">
+  <div class="form-row">
+
+    <div class="form-item">
+      <label>Date</label>
+      <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+    </div>
+
+    <div class="form-item">
+      <label>Customer</label>
+      <select name="customer">  
+        <% customers.forEach(customer => { %>        
+            <option selected label="<%= customer.name %>" value="<%= customer.id %>"></option>
+        <% }) %> 
+      </select>    
+    </div>
+
+    <div class="form-item">
+      <label>DO Number</label>
+      <input type="text" name="doNumber" value="<%= ddo.doNo %> ">
+    </div>
+  
+  </div>  
+  
+  <div class="form-row form-row-end btn-row">
+    <a class="btn btn-danger" href="/dos">Cancel</a>
+    <button class="btn btn-primary" type="submit">Create</button>
+  </div>
+
+</form>
+
