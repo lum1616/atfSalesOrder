@@ -1,6 +1,5 @@
 <h2 class="page-header">DO Details</h2>
 
-
 <form action="/dos/<%= doL.id %>?_method=PUT" method="POST">
 
   <div class="form-row">
@@ -14,6 +13,12 @@
       <input type="text" name= "name" value=" <%=customer.name%> " readonly>     
          
     </div>
+
+    <div class="form-item">
+      <label>Issuer</label>
+      <input type="text" name="issuer" value="<%= doL.issuer %> " readonly>
+    </div>
+  
     <div class="form-item">
       <label>DO Number</label>
       <input type="text" name="doNumber" value="<%= doL.doNo %> " readonly>
@@ -53,6 +58,8 @@
   <div class="form-row form-row-end btn-row">
     <a class="btn btn-danger" href="/dos">Cancel</a>
     <a class="btn btn-primary" href="/dos/<%= doL.id %>/add">Add New Part</a>
+    <a class="btn btn-primary" href="/dos/<%= doL.id %>/print">Print</a>
+    
      
     <!-- <button class="btn btn-primary" type="submit">Update</button> -->
   </div>

@@ -36,8 +36,8 @@
      </tr>
 
       <% let i=1 %>
-      <% salesOrders.forEach(so => { %> 
-          <% if (String(customer.id) === String(so.customer)) { %>
+      <% salesOrders.forEach(so => { %>           
+          <% if (String(salesOrder.orderNumber) === String(so.orderNumber)) { %>            
             <tr>
               <td><%= i %></td>
               <td><%= so.description %></td>

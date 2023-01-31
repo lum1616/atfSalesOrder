@@ -4,7 +4,11 @@ const SalesOrder = require('../models/salesOrder')
 const Customer = require('../models/customer')
 const DO = require('../models/do')
 const { Mongoose } = require('mongoose')
-
+const ejs = require('ejs')
+const path = require("path")
+const pdf = require("html-pdf")
+const fs =require('fs')
+const { jsPDF } = require('jspdf') 
 
 // All DOs Route
 router.get('/', async (req, res) => {
@@ -42,13 +46,15 @@ router.post('/', async (req, res) => {
     date: new Date(req.body.date),
     doNo: req.body.doNumber,     
     customer: req.body.customer,
-    issuer : "",
+    issuer : req.body.issuer,
+    status : " ",
     receiver : "",
     soNumber : "",
     poNumber : "",
     drawingNo : "",
     orderQty : 0,
-    deliverQty : 0
+    deliverQty : 0,
+    unitPrice : 0
   })
   
   try {
@@ -101,6 +107,60 @@ router.get('/:id/add', async (req, res) => {
   }
 })
 
+// Print Do Route lib=html-pdf 
+router.get('/:id/print', async (req, res) => {
+  try {
+    const dos = await DO.find() 
+    const doL = await DO.findById(req.params.id)
+    const customer = await Customer.findById(doL.customer.toString()).exec()
+      
+    let pdfFile = 'C:/DO/' + doL.doNo + '.pdf'
+   
+    
+    ejs.renderFile(path.join(__dirname, "../views/doTemplate.ejs"),
+     {dos, doL, customer},(err, data) => {
+                      if (err) {
+                        res.send(err);
+                      } else {
+                        let options = {
+                              "height": "11.25in",
+                              "width": "8.5in",
+                              "header": {
+                                  "height": "20mm",
+                              },
+                              "footer": {
+                                  "height": "20mm",
+                              },
+
+                          };
+                          pdf.create(data, options).toFile(pdfFile, function (err, data) {
+                              if (err) {
+                                  res.send(err);
+                              } else{
+
+                                  fs.readFile(pdfFile,function(error,data){
+                                          if(error){
+                                                  res.json({'status':'error',msg:err});
+                                          }else{                                               
+                                                  res.writeHead(200, {"Content-Type": "application/pdf"  });
+                                                  res.write(data);
+                                                  res.end();       
+                                                }
+                                  });
+                                }//else
+                          });
+
+                        }//else
+    })
+    //res.redirect('/')
+       
+  }
+  catch {
+          res.redirect('/')
+        }
+})
+
+
 // update (save) do Part Route
 router.put('/:id', async (req, res) => {
 
@@ -112,7 +172,8 @@ router.put('/:id', async (req, res) => {
       doN = new DO({
         date : new Date(req.body.date),
         doNo : req.body.doNumber,
-        customer : req.body.customerId      
+        customer : req.body.customerId , 
+        issuer : req.body.issuer    
        })      
     }
     
@@ -126,6 +187,8 @@ router.put('/:id', async (req, res) => {
     doN.orderQty = so.orderQty
     doN.drawingNo = so.drawingNo
     doN.deliverQty = req.body.deliverQty
+      
+    
     await doN.save()
     res.redirect(`/dos/${doN.id}`)
   } catch {
@@ -140,6 +203,7 @@ router.put('/:id', async (req, res) => {
 // Delete DO Page
 router.delete('/:id', async (req, res) => {
   let doL
+  //console.log(req.params.id);
   try {    
     doL = await DO.findById(req.params.id)
     await doL.remove()

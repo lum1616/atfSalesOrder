@@ -43,6 +43,8 @@ router.post('/', async (req, res) => {
   })
   // saveCover(salesOrder, req.body.cover)
   try {
+    console.log("save new so");
+    console.log(salesOrder);
     const newSalesOrder = await salesOrder.save()
     res.redirect(`salesOrders/${newSalesOrder.id}`)
   } catch {   

@@ -1,0 +1,92 @@
+<style>
+     tr {
+      text-align: right;
+      font-size: 1.8rem;
+     } 
+
+     td, th {
+      border: 1px solid #ddd;
+      padding: 8px;
+     }
+
+     tr:nth-child(even){background-color: #c5c4c7;}
+
+     tr:hover {background-color: rgb(9, 11, 105);}
+
+     th {
+      font-size: 2.0rem;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: center;
+      background-color: #0c8156;
+      color: white;
+      }
+
+      h2 {
+        margin: 0%;
+      }   
+      
+      /* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+
+<body>
+ <div style="width: 100%; text-align:center; padding: 0em; margin: 0em; " >
+        <h1 > Autofill Manufacturing Sdn. Bhd.</h1>
+        <h2>No. 10, Jalan 3, Taman Perindustrian Sinaran, </h2>
+        <h2>Jalan Mersing, 86000 Kluang,</h2>
+        <h2>Johor, Malaysia</h2>
+ </div>
+
+ 
+<div style="width: 85%; margin: 0 7.5%;">
+      <div class="row">
+         <div style="text-align: left; float: left;">
+          <h1><%= "             " + customer.name %></h1>
+          <h2><%= "             " + customer.address %></h2>
+          <h2><%= "PIC  : " + customer.pic %></h2>
+          <h2><%= "HP   : " + customer.handphone %></h2>      
+        </div>
+
+        <div style="text-align: right; ">
+          <h1 style="color: #0c8156;">Deliver Order</h1>      
+          <h1><%= doL.date.toISOString().split('T')[0] %></h1>   
+          <h1>   <%= "No:" +  doL.doNo %></h1> 
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+
+        <table>
+                <tr>
+                  <th>No</th>
+                  <th>SO No.</th>
+                  <th>PO No.</th>
+                  <th>Drawing No.</th>
+                  <th>Order Qty</th>
+                  <th>Deliver Qty</th>
+                </tr>
+                 <% let i=1 %>
+                 <% dos.forEach(dod => { %> 
+                   <% if (doL.doNo === dod.doNo) { %>
+                     <tr>
+                     <td><%= i %></td>
+                     <td><%= dod.soNumber %></td>
+                     <td><%= dod.poNumber %> </td>
+                     <td><%= dod.drawingNo %> </td>
+                     <td><%= dod.orderQty %> </td>
+                     <td><%= dod.deliverQty %> </td>
+                     </tr>
+                     <% i= i+1 %>
+                   <% } %>  
+                 <% }) %>      
+        </table>
+
+        <h1 style="text-align: right;"><%= "Issuer: " + doL.issuer %></h1> 
+ </div>
+</body>
