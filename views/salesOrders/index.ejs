@@ -1,14 +1,17 @@
-<h2 class="page-header" >SalesOrder List</h2>
+<h2 class="page-header" >FAB Order List</h2>
 <div class="form-row">
-  <a class="btn btn-danger" href="/salesOrders/newSO">Create New SO</a>
+  
+    <a class="btn btn-danger" href="/salesOrders/newSO">Create New FAB</a>
+
 </div>
 
 <% let sos =[] %>
-<form  action="/salesOrders">  
+ 
   <% salesOrders.forEach(salesOrder => { %>
     <% let position = sos.indexOf(salesOrder.orderNumber.trim())  %>
     <% if (position < 0) {%>
       <% sos.push((salesOrder.orderNumber).trim()) %>
+    
       <div class="customer-row">  
           <div class="customer-name">
             <%= salesOrder.orderNumber %>
@@ -22,13 +25,16 @@
 
           <div class="btn-row">     
             <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>">View</a>
-            <!-- <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/edit">Edit</a> -->
-            <%- include('../partials/deleteForm',
-                        { url: `/salesOrders/${salesOrder.id}` }) %>
+           <!-- <%- include('../partials/deleteForm',
+            { url: `/salesOrders/${salesOrder.id}` }) %>                        -->
+
           </div>
         </div>
+    
+     
+
     <% }%>  
   <% }) %> 
   
-</form>
+
 

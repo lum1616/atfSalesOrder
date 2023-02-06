@@ -10,11 +10,11 @@
   <% if (position < 0) {%>
     <% doList.push((ddo.doNo).trim()) %> 
     <div class="customer-row">
-     <div class="customer-name"><%= ddo.doNo %></div>        
+     <div class="customer-name"><%= ddo.doNo %></div>                  
      <div class="btn-row">
      <a class="btn btn-primary" href="/dos/<%= ddo.id %>">View</a>
-     <%- include('../partials/deleteForm',
-                  { url: `/dos/${ddo.id}` }) %>
+     <!-- <%- include('../partials/deleteForm',
+                  { url: `/dos/${ddo.id}` }) %> -->
      </div>
     </div>
   <% }%>  

@@ -1,10 +1,27 @@
-<h2 class="page-header">New SalesOrder</h2>
+<h2 class="page-header">New FAB Order</h2>
 <form action="/salesOrders" method="POST">
   <div class="form-row">
     <div class="form-item">
       <label>Date</label>
       <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
     </div>
+    <div class="form-item">
+      <label>FAB Order Number</label>      
+      <input type="text" name="orderNumber" value="<%= IptFABNo %> " readonly >
+    </div>
+    <div class="form-item">
+      <label>Barcode</label>      
+      <input type="text" name="barcode" value="<%= IptPANo %> " readonly >
+    </div>
+
+  </div>  
+
+  <div class="form-row">    
+    <div class="form-item">
+      <label>PO Number</label>
+      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %> ">
+    </div>
+
     <div class="form-item">
       <label>Customer</label>
       <select name="customer">  
@@ -16,19 +33,21 @@
           <% } %>
         <% }) %> 
       </select>    
-    </div>    
-    <div class="form-item">
-      <label>PO Number</label>
-      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %> ">
-   </div>
-    <div class="form-item">
-      <label>SalesOrder Number</label>
-      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
     </div>
+    
+
+
+
   </div>
-  
 
+  <div class="form-row">
+   <div class="form-item">
+    <label>Quotation Number</label>
+    <input type="text" name="quotationNo" value="<%= salesOrder.quotationNo %> " >
+   </div>   
+  </div>
 
+  <br>
 
   <div class="form-row form-row-end btn-row">
     <a class="btn btn-danger" href="/salesOrders">Cancel</a>

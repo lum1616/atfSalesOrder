@@ -1,14 +1,9 @@
-
-
-
-
-
-
-<h2 class="page-header"><%= form %> Part</h2>
+<h2 class="page-header">DO <%= form %> Part</h2>
 
 <form action="/dos/<%= doL.id %>?_method=PUT" method="POST">
  
   <div class="form-row">
+
     <div class="form-item">
       <label>Date</label>
       <input type="date" name="date" value="<%= doL.date == null ? '' : doL.date.toISOString().split('T')[0] %>" readonly>
@@ -23,7 +18,6 @@
       <label>Customer</label>      
       <input type="text" name="customer" value="<%= customer.name %>" readonly>
       <input type="hidden"  name="customerId" value="<%= customer.id %>">
-          
     </div> 
 
     <div class="form-item">
@@ -31,18 +25,22 @@
       <input type="hidden" name="id" value="<%= doL.id%>">
       <input type="text" name="doNumber" value="<%= doL.doNo%>" readonly>
     </div>
-  </div>
+
+  </div>  
 
   <div class="form-row">
+
     <div class="form-item">
-      <label>Drawing Number</label>      
+      <label>Barcode</label>      
       <select name="soId">          
-        <% salesOrders.forEach(so => { %>             
-            <% if (doL.drawingNo === so.drawingNo) {%>
-              <option selected label="<%= so.drawingNo %>" value="<%= so.id %>"> </option>   
+        <% salesOrders.forEach(so => { %>  
+          <% if (doL.customer.toString() === so.customer.toString() ) {%>
+            <% if (doL.barcode === so.barcode ) {%>
+              <option selected label="<%= so.barcode %>" value="<%= so.id %>"> </option>   
             <% } else { %>          
-                  <option label="<%= so.drawingNo %>" value="<%= so.id %>"> </option>   
-                  <% } %>
+                  <option label="<%= so.barcode %>" value="<%= so.id %>"> </option>   
+                <% } %>
+          <% } %>
         <% }) %>        
       </select>
     </div>
@@ -51,14 +49,15 @@
       <label>Quantity</label> 
       <input type="number" name="deliverQty" value="<%= doL.deliverQty %>">
     </div>
-  </div>  
 
+  </div>
+  <br>
   <div  class="form-row"> 
-    <div class="btn-row"  >
-      <label> </label>   
+    <div class="btn-row"  >       
       <button class="btn btn-primary" name="button" value="<%=form%>" type="submit"> Save </button>
     </div>
   </div>
+  
 </form>
 
 <%- include('../partials/deleteForm',

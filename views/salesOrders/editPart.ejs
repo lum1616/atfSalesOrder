@@ -8,7 +8,7 @@
   }
 </style>
 
-<h2 class="page-header"><%= form %> Part</h2>
+<h2 class="page-header">FAB <%= form %> Part</h2>
 
 <form action="/salesOrders/<%= salesOrder.id %>?_method=PUT" method="POST">
  
@@ -30,24 +30,41 @@
       <% }) %>      
     </div>  
 
+    
     <div class="form-item">
-      <label>PO Number</label>
-      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %>" readonly>
-    </div>
-
-    <div class="form-item">
-      <label>SO Number</label>
-      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+      <label>Barcode</label>
+      <input type="text" name="barcode" value="<%= salesOrder.barcode %> " >
     </div>
 
   </div>
 
   <div class="form-row"> 
+    <div class="form-item">
+      <label>PO Number</label>
+      <input type="text" name="poNumber" value="<%= salesOrder.poNumber %>" readonly>
+    </div>
+
+    <div class="form-item">      
+      <label>Quotation Number</label>
+      <input type="text" name="quotationNo" value="<%= salesOrder.quotationNo %> " >
+    </div>
 
     <div class="form-item">
+      <label>FAB Number</label>
+      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+    </div>
+  </div>
+  <br>
+
+  <div class="form-row"> 
+
+    <div class="form-item">      
       <label>Drawing Number</label>
       <input type="text" name="drawingNo" value="<%= salesOrder.drawingNo %> " >
     </div>
+
+
+
 
     <div class="form-item">
       <label>Quantity</label> 
@@ -56,7 +73,7 @@
 
     <div class="form-item">
       <label>Unit Price (RM)</label>
-      <input type="number" name="unitPrice" value="<%= salesOrder.unitPrice %>">
+      <input type="number" step='0.01' name="unitPrice" value="<%= salesOrder.unitPrice %>">
     </div>
     
 
@@ -69,11 +86,12 @@
     </div> 
   </div>
 
-  <div  class="btn-row">
-    <img src="<%= salesOrder.partImagePath %>" >
-    <button class="btn btn-primary" name="button" value="<%=form%>" type="submit"> Save </button>
+  <div class="form-row">
+    <div  class="btn-row">
+      <!-- <img src="<%= salesOrder.partImagePath %>" > -->
+      <button class="btn btn-primary" name="button" value="<%=form%>" type="submit"> Save </button>
+    </div>
   </div>
-
 </form>
 
 <%- include('../partials/deleteForm',

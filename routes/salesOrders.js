@@ -4,17 +4,20 @@ const SalesOrder = require('../models/salesOrder')
 const Customer = require('../models/customer')
 const { Mongoose } = require('mongoose')
 const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif']
+const runNumber = require('../models/runNumber')
+
 
 
 // All SalesOrders Route
-router.get('/', async (req, res) => {
-
+router.get('/', async (req, res) => {  
+  
   let query = SalesOrder.find() 
+  
   try {
     const salesOrders = await query.exec()
     res.render('salesOrders/index', {
       salesOrders: salesOrders,
-      searchOptions: req.query      
+      searchOptions: req.query,        
     })
   } catch {
     res.redirect('/')
@@ -24,10 +27,21 @@ router.get('/', async (req, res) => {
 // New SalesOrders Route
 router.get('/newSO', async (req, res) => {
 
-  const customers = await Customer.find({}) 
+  
+  const customers = await Customer.find({})
+
+  //get FAB running number
+  let IptFABNo = await getRunNo("FAB")
+
+  //get FAB running number
+  let IptPANo = await getRunNo("PA")
+  
+
   const params = {
     customers: customers,
-    salesOrder: new SalesOrder()     
+    salesOrder: new SalesOrder(),    
+    IptFABNo : IptFABNo,
+    IptPANo : IptPANo 
   }
   res.render(`salesOrders/newSO`, params)
   //  renderNewPage(res, new SalesOrder())
@@ -37,18 +51,32 @@ router.get('/newSO', async (req, res) => {
 router.post('/', async (req, res) => {
   const salesOrder = new SalesOrder({
     date: new Date(req.body.date),
-    orderNumber: req.body.orderNumber, 
-    poNumber: req.body.poNumber, 
-    customer: req.body.customer
+    orderNumber: req.body.orderNumber.trim(), 
+    poNumber: req.body.poNumber.trim(), 
+    customer: req.body.customer,
+    quotationNo: req.body.quotationNo.trim(),
+    barcode: req.body.barcode.trim(),
+    unitPrice : 1,
+    orderQty : 1
   })
-  // saveCover(salesOrder, req.body.cover)
+  
+  const fabNumber = await runNumber.findOne({code : "FAB"})
+  fabNumber.counter++ 
+  
+  const paNumber = await runNumber.findOne({code : "PA"})
+   paNumber.counter++ 
+
+
+  
+  // save
   try {
-    console.log("save new so");
-    console.log(salesOrder);
+    await fabNumber.save()
+    await paNumber.save()
+    
     const newSalesOrder = await salesOrder.save()
     res.redirect(`salesOrders/${newSalesOrder.id}`)
   } catch {   
-    renderNewPage(res, salesOrder, true)
+    res.redirect('/')
   }
 })
 
@@ -56,6 +84,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   let query = SalesOrder.find() 
 
+  
   try {    
     const salesOrder = await SalesOrder.findById(req.params.id).exec() 
     const salesOrders = await query.exec()   
@@ -99,12 +128,13 @@ router.put('/:id', async (req, res) => {
 
   try { 
     if (req.body.button === "Add"){
-
-     salesOrder = new SalesOrder({
+      salesOrder = new SalesOrder({
       date : new Date(req.body.date),
-      orderNumber : req.body.orderNumber,
-      poNumber : req.body.poNumber,
-      customer : req.body.customerId      
+      orderNumber : req.body.orderNumber.trim(),
+      poNumber : req.body.poNumber.trim(),
+      customer : req.body.customerId,
+      barcode : req.body.barcode.trim()  
+          
      }) 
      
 
@@ -117,18 +147,23 @@ router.put('/:id', async (req, res) => {
     
     salesOrder.orderQty = Number(req.body.orderQty)
     salesOrder.unitPrice = Number(req.body.unitPrice)
-    salesOrder.drawingNo = req.body.drawingNo
-    salesOrder.description = req.body.description  
+    salesOrder.drawingNo = req.body.drawingNo.trim()
+    salesOrder.description = req.body.description.trim()  
+    salesOrder.quotationNo = req.body.quotationNo.trim()
     
     await salesOrder.save()
+    
+    const paNumber = await runNumber.findOne({code : "PA"})
+    paNumber.counter++ 
+    await paNumber.save()
     
     res.redirect(`/salesOrders/${salesOrder.id}`)
   } catch {
     if (salesOrder != null) {
-      console.log("1");
+      //console.log("1");
       renderEditPage(res, salesOrder, true)
     } else {
-      console.log("2");
+      //console.log("2");
       res.redirect('/')
     }
   }
@@ -137,9 +172,11 @@ router.put('/:id', async (req, res) => {
 // Delete SalesOrder Page
 router.delete('/:id', async (req, res) => {
   let salesOrder
+  
   try {    
     salesOrder = await SalesOrder.findById(req.params.id)
     await salesOrder.remove()
+    //await SalesOrder.deleteMany({orderNumber:salesOrder.orderNumber}) 
     res.redirect('/salesOrders')
   } catch {
     if (salesOrder != null) {      
@@ -147,7 +184,8 @@ router.delete('/:id', async (req, res) => {
         salesOrder: salesOrder,
         errorMessage: 'Could not remove salesOrder'
       })
-    } else {     
+    } else {  
+        
       res.redirect('/')
     }
   }
@@ -165,7 +203,15 @@ async function renderEditPage(res, salesOrder, hasError = false) {
 
 async function renderFormPage(res, salesOrder, form, hasError = false) {
   try {   
-    const customers = await Customer.find({})    
+    const customers = await Customer.find({})
+   
+   
+    if(form === "Add"){
+      salesOrder.barcode = await getRunNo("PA") 
+      console.log("add"+salesOrder.barcode);     
+    }
+
+    
     const params = {
       customers: customers,
       salesOrder: salesOrder,
@@ -197,6 +243,31 @@ function saveCover(salesOrder, coverEncoded) {
     part.partImage = new Buffer.from(cover.data, 'base64')
     part.partImageType = cover.type
   }
+}
+
+
+async function getRunNo(Code){
+  
+  let _runNumber = await runNumber.findOne({code: [Code]})
+  
+   if (_runNumber == null){
+    _runNumber = new runNumber()
+    _runNumber.code = Code
+    _runNumber.counter = 0
+    await _runNumber.save()
+    _runNumber.counter++ 
+  }else {
+    _runNumber = await runNumber.findOne({code: [Code]})
+    _runNumber.counter++ 
+  
+  }   
+  let d = new Date()
+  let year = d.getFullYear().toString()
+  let strCnt = _runNumber.counter.toString().padStart(6, '0')
+
+  let IptRunNo = _runNumber.code + "-" + year.substring(2) + "-" + strCnt 
+ 
+  return IptRunNo  
 }
 
 module.exports = router

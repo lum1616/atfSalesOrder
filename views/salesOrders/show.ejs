@@ -1,5 +1,4 @@
-<h2 class="page-header">SalesOrder Details</h2>
-
+<h2 class="page-header">FAB Order Details</h2>
 
 <form action="/salesOrders/<%= salesOrder.id %>?_method=PUT" method="POST">
 
@@ -8,54 +7,60 @@
       <label>Date</label>
       <input type="date" name="date" value="<%= salesOrder.date == null ? '' : salesOrder.date.toISOString().split('T')[0] %>" readonly>
     </div>
-    <div class="form-item">
-      
+    <div class="form-item">      
       <label>Customer</label>
-      <input type="text" name= "name" value=" <%=customer.name%> " readonly>     
-         
+      <input type="text" name= "name" value=" <%=customer.name%> " readonly>          
+    </div>    
+    <div class="form-item">
+      <label>FAB Number</label>
+      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " readonly >
     </div>
+  </div>
+
+  <div class="form-row">
     <div class="form-item">
       <label>PO Number</label>
       <input type="text" name="poNumber" value="<%= salesOrder.poNumber %> " readonly>
     </div>
-   <div class="form-item">
-      <label>SO Number</label>
-      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " readonly >
+    <div class="form-item">
+      <label>Quotation Number</label>
+      <input type="text" name="quotationNo" value="<%= salesOrder.quotationNo %> " readonly >
     </div>
   </div>
-  <h3 class="page-header">Parts Details</h3>
+  <br>
+  <h2>Parts Details</h2>
   <div class="form-row">
    <table>
      <tr>
        <th>No</th>
        <th>Description</th>
        <th>Drawing No</th>
+       <th>Barcode</th>
        <th>Quantity</th>
-       <th>Unit Price</th>
-       <th></th>                
+       <th>Unit Price</th>                      
      </tr>
 
       <% let i=1 %>
       <% salesOrders.forEach(so => { %>           
-          <% if (String(salesOrder.orderNumber) === String(so.orderNumber)) { %>            
+          <% if (String(salesOrder.orderNumber.trim()) === String(so.orderNumber.trim())) { %>            
             <tr>
-              <td><%= i %></td>
+              <td><a class="btn-primary " href="/salesOrders/<%= so.id %>/edit"><%= i %></a></td>
               <td><%= so.description %></td>
               <td><%= so.drawingNo %> </td>
+              <td><%= so.barcode %> </td>
               <td><%= so.orderQty %> </td>
-              <td><%= so.unitPrice %> </td>
-              <td> <a class="btnS btn-primary " href="/salesOrders/<%= so.id %>/edit">Edit</a></td>          
+              <td><%= so.unitPrice.toFixed(2) %> </td>                 
             </tr>
             <% i= i+1 %>
           <% } %>
-      <% }) %>      
-
+      <% }) %>
     </table>
+
   </div>
+
   <div class="form-row form-row-end btn-row">
-    <a class="btn btn-danger" href="/salesOrders">Cancel</a>
-    <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/add">Add New Part</a>
-     
+    <!-- <a class="btn btn-danger" href="/salesOrders">Cancel</a> -->
+    <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>/add">Add Part</a>
     <!-- <button class="btn btn-primary" type="submit">Update</button> -->
   </div>
 </form>

@@ -8,16 +8,19 @@ const ejs = require('ejs')
 const path = require("path")
 const pdf = require("html-pdf")
 const fs =require('fs')
-const { jsPDF } = require('jspdf') 
+const { jsPDF } = require('jspdf')
+const runNumber = require('../models/runNumber') 
 
 // All DOs Route
 router.get('/', async (req, res) => {
 
-  let query = DO.find() 
+  let query = DO.find()
+  let customers = Customer.find()  
   try {
     const dos = await query.exec()       
     res.render('dos/index', {
       dos: dos,
+      customers : customers,
       searchOptions: req.query      
     })
   } catch {    
@@ -28,13 +31,29 @@ router.get('/', async (req, res) => {
 // New DOs Route
 router.get('/newDO', async (req, res) => {
 
-  const dos = await DO.find({}) 
+    const dos = await DO.find({}) 
   const customers = await Customer.find({}) 
+
+   //get DO running number
+   let doNumber = await runNumber.findOne({code: "DO"})
+ 
+   if (doNumber == null){
+     doNumber = new DOnumber()
+     doNumber.code = "DO"
+     doNumber.counter = 0
+     await doNumber.save()
+     doNumber.counter++ 
+   }else {     
+     doNumber.counter++     
+   }
+    
+   IptDONo = await getRunNo("DO")
    
   const params = {
     dos: dos,
     customers : customers,    
-    ddo: new DO()     
+    ddo: new DO(),   
+    IptDONo : IptDONo  
   }
   res.render(`dos/newDO`, params)
   
@@ -44,7 +63,7 @@ router.get('/newDO', async (req, res) => {
 router.post('/', async (req, res) => {
   const doN = new DO({
     date: new Date(req.body.date),
-    doNo: req.body.doNumber,     
+    doNo: req.body.doNumber.trim(),     
     customer: req.body.customer,
     issuer : req.body.issuer,
     status : " ",
@@ -56,8 +75,18 @@ router.post('/', async (req, res) => {
     deliverQty : 0,
     unitPrice : 0
   })
+  const doNumber = await runNumber.findOne({code : "DO"})
+  doNumber.counter++ 
+
+  /* doN.barcode = await getRunNo("PA")
+  const paNumber = await runNumber.findOne({code : "PA"})
+  paNumber.counter++ 
+  await paNumber.save() */
+
   
   try {
+
+    await doNumber.save()
     const newDo = await doN.save()
     res.redirect(`dos/${newDo.id}`)
   } catch {   
@@ -187,6 +216,7 @@ router.put('/:id', async (req, res) => {
     doN.orderQty = so.orderQty
     doN.drawingNo = so.drawingNo
     doN.deliverQty = req.body.deliverQty
+    doN.barcode = so.barcode
       
     
     await doN.save()
@@ -231,6 +261,12 @@ async function renderEditPage(res, doL, customer, hasError = false) {
 async function renderFormPage(res, doL, customer,form, hasError = false) {
   try {   
     const salesOrders = await SalesOrder.find({})
+    
+    if(form === "Add"){
+     
+      doL.barcode = await getRunNo("PA")      
+    }
+
     const params = {
       salesOrders : salesOrders,
       customer: customer,
@@ -245,11 +281,37 @@ async function renderFormPage(res, doL, customer,form, hasError = false) {
       }
     } */
     //res.render(`salesOrders/${form}`, params)
+    
     res.render(`dos/editPart`, params)
  
   } catch {    
     res.redirect('/dos')
   }
+}
+
+async function getRunNo(Code){
+  
+  let _runNumber = await runNumber.findOne({code: [Code]})
+  
+   if (_runNumber == null){
+    _runNumber = new runNumber()
+    _runNumber.code = Code
+    _runNumber.counter = 0
+    await _runNumber.save()
+    _runNumber.counter++ 
+  }else {
+    _runNumber = await runNumber.findOne({code: [Code]})
+    _runNumber.counter++ 
+  
+  }   
+  let d = new Date()
+  let year = d.getFullYear().toString()
+  let strCnt = _runNumber.counter.toString().padStart(6, '0')
+
+  return _runNumber.code + "-" + year.substring(2) + "-" + strCnt 
+ 
+  
+  
 }
 
 module.exports = router

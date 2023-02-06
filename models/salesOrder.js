@@ -7,6 +7,7 @@ const salesOrderSchema = new mongoose.Schema({
     type: Date,   
     default: Date.now
   },
+  // = FAB number
   orderNumber: {
     type: String   
   },
@@ -33,9 +34,17 @@ const salesOrderSchema = new mongoose.Schema({
   drawingNo: {
     type: String    
     },
+  barcode : {
+    type: String
+  },  
   prodType: {
     type: String    
     },
+  // quotation number link  
+  quotationNo: {
+    type: String    
+    }, 
+
   description: {
     type: String    
     },
