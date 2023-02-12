@@ -5,17 +5,23 @@
 <br>
 
 <% let doList =[] %>
+<% let name="" %>
 <% dos.forEach( ddo => { %>
   <% let position = doList.indexOf((ddo.doNo).trim())  %>
   <% if (position < 0) {%>
-    <% doList.push((ddo.doNo).trim()) %> 
+    <% doList.push((ddo.doNo).trim()) %>       
+    <% customers.forEach( c => { %>       
+      <% if( c.id == ddo.customer) { %>
+          <% name = c.name %>              
+      <% } %>
+    <% }) %>    
     <div class="customer-row">
-     <div class="customer-name"><%= ddo.doNo %></div>                  
-     <div class="btn-row">
-     <a class="btn btn-primary" href="/dos/<%= ddo.id %>">View</a>
-     <!-- <%- include('../partials/deleteForm',
+     <div class="customer-name"><%= ddo.doNo + " - " + name %></div> 
+    
+      <a class="btn btn-primary" href="/dos/<%= ddo.id %>">View</a>
+      <!-- <%- include('../partials/deleteForm',
                   { url: `/dos/${ddo.id}` }) %> -->
-     </div>
+    
     </div>
   <% }%>  
 <% }) %>

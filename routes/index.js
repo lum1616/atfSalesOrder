@@ -1,16 +1,51 @@
 const express = require('express')
 const salesOrder = require('../models/salesOrder')
 const router = express.Router()
+const Customer = require('../models/customer')
 
 
 router.get('/', async (req, res) => {
+  
   let salesOrders
+  let customers
+  let title
+
   try {
-    salesOrders = await salesOrder.find().sort({ createdAt: 'desc' }).limit(10).exec()
-  } catch {
-    salesOrders = []
+    // salesOrders = await salesOrder.find().sort({ createdAt: 'desc' }).limit(10).exec()
+    salesOrders = await salesOrder.find().sort({ customer: 1 }).exec()
+    customers = await Customer.find({})
+    title="Parts In Progress"
+
+    } catch {
+    salesOrders = [] 
   }
-  res.render('index', { salesOrders: salesOrders })
+
+  res.render('index', { so: salesOrders, cu : customers, title:title })
 })
+
+router.post('/', async (req, res) => {
+
+  let salesOrders
+  let customers
+
+  try {
+    title = req.body.filter
+    if (title === "FAB Orders"){
+      salesOrders = await salesOrder.find().sort({ orderNumber: 1 }).exec()
+      customers = await Customer.find({})
+      res.render(`fabList`, { so: salesOrders, cu : customers, title:title })
+      }
+      if (title === "Parts In Progress"){
+       res.redirect('/') 
+      }  
+
+
+
+  } catch {   
+   
+  }
+})
+
+
 
 module.exports = router

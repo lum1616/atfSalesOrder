@@ -12,11 +12,13 @@ const runNumber = require('../models/runNumber')
 router.get('/', async (req, res) => {  
   
   let query = SalesOrder.find() 
+  const customers = await Customer.find() 
   
   try {
     const salesOrders = await query.exec()
     res.render('salesOrders/index', {
       salesOrders: salesOrders,
+      customers : customers,
       searchOptions: req.query,        
     })
   } catch {
@@ -56,7 +58,9 @@ router.post('/', async (req, res) => {
     customer: req.body.customer,
     quotationNo: req.body.quotationNo.trim(),
     barcode: req.body.barcode.trim(),
+    status : "",
     unitPrice : 1,
+    deliveredQty : 0,    
     orderQty : 1
   })
   
@@ -133,9 +137,14 @@ router.put('/:id', async (req, res) => {
       orderNumber : req.body.orderNumber.trim(),
       poNumber : req.body.poNumber.trim(),
       customer : req.body.customerId,
-      barcode : req.body.barcode.trim()  
+      barcode : req.body.barcode.trim(),
+      deliveredQty : 0,
+      status : ""  
           
      }) 
+     const paNumber = await runNumber.findOne({code : "PA"})
+    paNumber.counter++ 
+    await paNumber.save()
      
 
     }
@@ -153,9 +162,7 @@ router.put('/:id', async (req, res) => {
     
     await salesOrder.save()
     
-    const paNumber = await runNumber.findOne({code : "PA"})
-    paNumber.counter++ 
-    await paNumber.save()
+    
     
     res.redirect(`/salesOrders/${salesOrder.id}`)
   } catch {
@@ -178,6 +185,7 @@ router.delete('/:id', async (req, res) => {
     await salesOrder.remove()
     //await SalesOrder.deleteMany({orderNumber:salesOrder.orderNumber}) 
     res.redirect('/salesOrders')
+    //res.redirect(`/salesOrders/${salesOrder.id}`)
   } catch {
     if (salesOrder != null) {      
       res.render('salesOrders/show', {
@@ -207,8 +215,7 @@ async function renderFormPage(res, salesOrder, form, hasError = false) {
    
    
     if(form === "Add"){
-      salesOrder.barcode = await getRunNo("PA") 
-      console.log("add"+salesOrder.barcode);     
+      salesOrder.barcode = await getRunNo("PA")           
     }
 
     

@@ -33,7 +33,7 @@
     
     <div class="form-item">
       <label>Barcode</label>
-      <input type="text" name="barcode" value="<%= salesOrder.barcode %> " >
+      <input type="text" name="barcode" value="<%= salesOrder.barcode %> " readonly>
     </div>
 
   </div>
@@ -46,12 +46,12 @@
 
     <div class="form-item">      
       <label>Quotation Number</label>
-      <input type="text" name="quotationNo" value="<%= salesOrder.quotationNo %> " >
+      <input type="text" name="quotationNo" value="<%= salesOrder.quotationNo %> " readonly>
     </div>
 
     <div class="form-item">
       <label>FAB Number</label>
-      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " >
+      <input type="text" name="orderNumber" value="<%= salesOrder.orderNumber %> " readonly>
     </div>
   </div>
   <br>
@@ -59,7 +59,7 @@
   <div class="form-row"> 
 
     <div class="form-item">      
-      <label>Drawing Number</label>
+      <label >Drawing Number</label>
       <input type="text" name="drawingNo" value="<%= salesOrder.drawingNo %> " >
     </div>
 

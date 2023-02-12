@@ -37,6 +37,7 @@
        <th>Drawing No</th>
        <th>Barcode</th>
        <th>Quantity</th>
+       <th>Delivered Qty</th>
        <th>Unit Price</th>                      
      </tr>
 
@@ -49,6 +50,7 @@
               <td><%= so.drawingNo %> </td>
               <td><%= so.barcode %> </td>
               <td><%= so.orderQty %> </td>
+              <td><%= so.deliveredQty %> </td>              
               <td><%= so.unitPrice.toFixed(2) %> </td>                 
             </tr>
             <% i= i+1 %>

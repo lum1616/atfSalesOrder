@@ -13,9 +13,9 @@ const runNumber = require('../models/runNumber')
 
 // All DOs Route
 router.get('/', async (req, res) => {
-
-  let query = DO.find()
-  let customers = Customer.find()  
+  
+  let query = DO.find()  
+  const customers = await Customer.find() 
   try {
     const dos = await query.exec()       
     res.render('dos/index', {
@@ -38,7 +38,7 @@ router.get('/newDO', async (req, res) => {
    let doNumber = await runNumber.findOne({code: "DO"})
  
    if (doNumber == null){
-     doNumber = new DOnumber()
+     doNumber = new runNumber()
      doNumber.code = "DO"
      doNumber.counter = 0
      await doNumber.save()
@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
     date: new Date(req.body.date),
     doNo: req.body.doNumber.trim(),     
     customer: req.body.customer,
-    issuer : req.body.issuer,
+    issuer : req.body.issuer.trim(),
     status : " ",
     receiver : "",
     soNumber : "",
@@ -116,9 +116,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/edit', async (req, res) => {  
   try {     
     const doL = await DO.findById(req.params.id).exec()
-    //console.log(doL);
     const customer = await Customer.findById(doL.customer.toString()).exec()
-    //console.log("e");
     renderEditPage(res, doL, customer)
   } catch {
              res.redirect('/')
@@ -192,23 +190,25 @@ router.get('/:id/print', async (req, res) => {
 
 // update (save) do Part Route
 router.put('/:id', async (req, res) => {
-
-  let so = await SalesOrder.findById(req.body.soId)
-  let doN = await DO.findById(req.body.id)    
   
+  let so = await SalesOrder.findById(req.body.soId)
+  let doN = await DO.findById(req.body.id)
+  let lastDeliver
   try { 
     if (req.body.button === "Add"){       
       doN = new DO({
         date : new Date(req.body.date),
         doNo : req.body.doNumber,
         customer : req.body.customerId , 
-        issuer : req.body.issuer    
+        issuer : req.body.issuer.trim()    
        })      
     }
-    
     if (req.body.button === "Edit")
     { 
-      doN = await DO.findById(req.body.id)      
+      doN = await DO.findById(req.body.id)
+      if (doN.status === "send"){
+        lastDeliver = doN.deliverQty        
+      }
     }
     doN.soNumber = so.orderNumber
     doN.poNumber = so.poNumber
@@ -217,16 +217,34 @@ router.put('/:id', async (req, res) => {
     doN.drawingNo = so.drawingNo
     doN.deliverQty = req.body.deliverQty
     doN.barcode = so.barcode
-      
-    
+
+    // update do and salesorder status and delivered quantity
+    let _so = await SalesOrder.findOne({barcode: [doN.barcode]})
+    if (_so !== null){      
+      if (doN.status !== "send"){
+        doN.status = "send"
+        _so.deliveredQty += doN.deliverQty
+        
+      }else{
+        _so.deliveredQty -= lastDeliver
+        _so.deliveredQty += doN.deliverQty
+        }
+      if (_so.deliveredQty >= _so.orderQty){
+        _so.status = "done"
+      }else{
+        _so.status = "" 
+        }
+
+      await _so.save()
+    }
     await doN.save()
     res.redirect(`/dos/${doN.id}`)
-  } catch {
+  }
+  catch {
       if (doN != null) {          
-          renderEditPage(res, doN, true)
-          } else {                 
-                  res.redirect('/')
-                  }
+        renderEditPage(res, doN, true)
+      }
+      else {res.redirect('/') }
   }
 })
 
@@ -262,15 +280,26 @@ async function renderFormPage(res, doL, customer,form, hasError = false) {
   try {   
     const salesOrders = await SalesOrder.find({})
     
-    if(form === "Add"){
-     
+    if(form === "Add"){     
       doL.barcode = await getRunNo("PA")      
     }
+    
+    let orderQtyList = []
+    let deliveredQtyList = []
+    salesOrders.forEach(so => {  
+       if (doL.customer.toString() === so.customer.toString() ) {
+          orderQtyList.push(so.orderQty)
+          deliveredQtyList.push(so.deliveredQty)
+      }
+    })
+    
 
     const params = {
       salesOrders : salesOrders,
       customer: customer,
-      doL: doL,     
+      doL: doL,
+      orderQtyList : orderQtyList,
+      deliveredQtyList : deliveredQtyList,
       form : form          
     }       
     /* if (hasError) {
@@ -309,8 +338,6 @@ async function getRunNo(Code){
   let strCnt = _runNumber.counter.toString().padStart(6, '0')
 
   return _runNumber.code + "-" + year.substring(2) + "-" + strCnt 
- 
-  
   
 }
 

@@ -24,7 +24,7 @@ const salesOrderSchema = new mongoose.Schema({
     type: Number
   },
 
-  deliverQty: {
+  deliveredQty: {
     type: Number   
   },
 

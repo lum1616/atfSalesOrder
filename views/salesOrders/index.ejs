@@ -1,20 +1,23 @@
 <h2 class="page-header" >FAB Order List</h2>
-<div class="form-row">
-  
+<div class="form-row">  
     <a class="btn btn-danger" href="/salesOrders/newSO">Create New FAB</a>
-
 </div>
+<br>
 
 <% let sos =[] %>
- 
+<% let name="" %>  
   <% salesOrders.forEach(salesOrder => { %>
     <% let position = sos.indexOf(salesOrder.orderNumber.trim())  %>
     <% if (position < 0) {%>
       <% sos.push((salesOrder.orderNumber).trim()) %>
-    
+      <% customers.forEach( c => { %>       
+        <% if( c.id == salesOrder.customer) { %>
+            <% name = c.name %>              
+        <% } %>
+      <% }) %> 
       <div class="customer-row">  
           <div class="customer-name">
-            <%= salesOrder.orderNumber %>
+            <%= salesOrder.orderNumber + " - " + name %>
           </div>
            <!-- 
             <div style="margin-right:100px;">
@@ -22,17 +25,12 @@
                  <img src="<%= salesOrder.partImagePath %>" width="100" height="100">               
               </a>
             </div> -->
-
           <div class="btn-row">     
             <a class="btn btn-primary" href="/salesOrders/<%= salesOrder.id %>">View</a>
            <!-- <%- include('../partials/deleteForm',
             { url: `/salesOrders/${salesOrder.id}` }) %>                        -->
-
           </div>
         </div>
-    
-     
-
     <% }%>  
   <% }) %> 
   

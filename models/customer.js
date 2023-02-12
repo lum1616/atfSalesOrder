@@ -15,10 +15,17 @@ const customerSchema = new mongoose.Schema({
   fax: {
     type: String,
   },
+  email: {
+    type: String,
+  },
+  
   pic: {
     type: String,
   },
   handphone: {
+    type: String,
+  },
+  terms: {
     type: String,
   },
   status: {

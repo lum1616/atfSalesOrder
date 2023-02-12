@@ -1,3 +1,10 @@
+<script>  
+  function myFunction(idx) {     
+    document.getElementById("deliveredQty").selectedIndex = idx   
+    document.getElementById("orderQty").selectedIndex = idx
+  }
+</script>
+
 <h2 class="page-header">DO <%= form %> Part</h2>
 
 <form action="/dos/<%= doL.id %>?_method=PUT" method="POST">
@@ -21,7 +28,7 @@
     </div> 
 
     <div class="form-item">
-      <label>DO Number</label>
+      <label id="do">DO Number</label>
       <input type="hidden" name="id" value="<%= doL.id%>">
       <input type="text" name="doNumber" value="<%= doL.doNo%>" readonly>
     </div>
@@ -29,14 +36,14 @@
   </div>  
 
   <div class="form-row">
-
     <div class="form-item">
-      <label>Barcode</label>      
-      <select name="soId">          
+      <label>Barcode</label>           
+      <select id="barcode"   name="soId" onchange="myFunction(this.selectedIndex)"> 
         <% salesOrders.forEach(so => { %>  
           <% if (doL.customer.toString() === so.customer.toString() ) {%>
+            
             <% if (doL.barcode === so.barcode ) {%>
-              <option selected label="<%= so.barcode %>" value="<%= so.id %>"> </option>   
+              <option selected label="<%= so.barcode %>" value="<%= so.id %>" > </option>   
             <% } else { %>          
                   <option label="<%= so.barcode %>" value="<%= so.id %>"> </option>   
                 <% } %>
@@ -46,22 +53,47 @@
     </div>
 
     <div class="form-item">
+      <label>Order Qty</label> 
+      <select name="" id="orderQty">
+        <% let i=0%>
+        <% orderQtyList.forEach(oq => { %>  
+          <option label="<%= orderQtyList[i] %>"></option>
+          <% i++ %>
+        <% }) %> 
+      </select>      
+    </div>
+    <div class="form-item">
+      <label>Delivered Qty</label> 
+      <select name="" id="deliveredQty">
+        <% i=0 %>
+        <% deliveredQtyList.forEach(oq => { %>  
+          <option label="<%= deliveredQtyList[i] %>"></option>
+          <% i++ %>
+        <% }) %> 
+      </select>      
+    </div>
+    
+
+    <div class="form-item">
       <label>Quantity</label> 
-      <input type="number" name="deliverQty" value="<%= doL.deliverQty %>">
+      <input type="number" id="deliverQty" name="deliverQty" value="<%= doL.deliverQty %>" >
     </div>
 
   </div>
   <br>
   <div  class="form-row"> 
-    <div class="btn-row"  >       
+    <div class="btn-row btn-row-end"  >       
       <button class="btn btn-primary" name="button" value="<%=form%>" type="submit"> Save </button>
+      
     </div>
   </div>
-  
 </form>
-
+<div class="btn-row btn-row-end"  > 
 <%- include('../partials/deleteForm',
-        { url: `/dos/${doL.id}` }) %> 
+        { url: `/dos/${doL.id}` }) %>
+</div>        
+
+
 
 
   

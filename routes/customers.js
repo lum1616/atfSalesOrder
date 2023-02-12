@@ -32,12 +32,13 @@ router.post('/', async (req, res) => {
     name: req.body.name,
     address: req.body.address,
     phone: req.body.phone,
-    fax: req.body.fax,
+    email: req.body.email,
     pic: req.body.pic,
     handphone: req.body.handphone,  
+    terms : "",
     status: "" 
   })
-  console.log(customer);
+  //console.log(customer);
   try {
     const newCustomer = await customer.save()
     res.redirect(`customers/${newCustomer.id}`)
@@ -79,8 +80,9 @@ router.put('/:id', async (req, res) => {
     customer.name = req.body.name
     customer.address = req.body.address
     customer.phone = req.body.phone
-    customer.fax = req.body.fax
+    customer.email = req.body.email
     customer.pic = req.body.pic
+    customer.terms = req.body.terms
     customer.handphone = req.body.handphone
     await customer.save()
     res.redirect(`/customers/${customer.id}`)
