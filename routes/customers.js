@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
     email: req.body.email,
     pic: req.body.pic,
     handphone: req.body.handphone,  
-    terms : "",
+    terms : req.body.terms,
     status: "" 
   })
   //console.log(customer);

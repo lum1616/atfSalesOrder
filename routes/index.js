@@ -2,6 +2,7 @@ const express = require('express')
 const salesOrder = require('../models/salesOrder')
 const router = express.Router()
 const Customer = require('../models/customer')
+const DO = require('../models/do')
 
 
 router.get('/', async (req, res) => {
@@ -27,17 +28,36 @@ router.post('/', async (req, res) => {
 
   let salesOrders
   let customers
+  let dos
 
   try {
+    
+    salesOrders = await salesOrder.find().sort({ orderNumber: 1 }).exec()
+    customers = await Customer.find({})
+    dos = await DO.find().sort({ drawingNo: 1 }).exec()   
     title = req.body.filter
+    //
     if (title === "FAB Orders"){
-      salesOrders = await salesOrder.find().sort({ orderNumber: 1 }).exec()
-      customers = await Customer.find({})
+      
       res.render(`fabList`, { so: salesOrders, cu : customers, title:title })
       }
-      if (title === "Parts In Progress"){
+    //  
+    if (title === "DO List"){
+       res.render(`doList`, { dos: dos, cu : customers, title:title })
+      }
+    if (title === "Description"){
+        res.render(`descList`, { so: salesOrders, cu : customers, title:title })
+       }
+ 
+    //  
+    if (title === "Parts In Progress"){
        res.redirect('/') 
-      }  
+     }  
+
+
+
+
+      
 
 
 

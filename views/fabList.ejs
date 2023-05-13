@@ -8,34 +8,33 @@
        <th>FAB Number</th>
        <th>Customer</th>
        <th>Date</th>       
-       <th>Drawing No</th>
-       <th>Order Qty</th>
-       <th>Delivered <br>Qty</th>
-       <th>Unit Price</th>                  
+                 
      </tr>
       <% let i=1 %>
       <% let name ="" %>
-      
+      <% let fabList =[] %>
       <% so.forEach(s => { %>
-        <% if( s.status !== "done") { %>
+       
           <% cu.forEach(c => { %>
             <% if( c.id == s.customer) { %>
                 <% name = c.name %>              
             <% } %>
           <% }) %>       
+           
+          <% let position = fabList.indexOf(s.orderNumber)  %>
+          <% if (position < 0) {%>
+            <% fabList.push(s.orderNumber) %>
+          
+            <tr>
+              <td><a class="btn-primary " href="/salesOrders/<%= s.id %>"><%= i %></a></td>
+              <td><%= s.orderNumber %> </td>
+              <td><%= name %></td>
+              <td><%= s.date.toISOString().split('T')[0] %></td>
+                      
+            </tr>
+          <% } %>
+          <% i= i+1 %>
             
-          <tr>
-            <td><a class="btn-primary " href="/salesOrders/<%= s.id %>"><%= i %></a></td>
-            <td><%= s.orderNumber %> </td>
-            <td><%= name %></td>
-            <td><%= s.date.toISOString().split('T')[0] %></td>
-            <td><%= s.drawingNo%> </td>
-            <td><%= s.orderQty %> </td>              
-            <td><%= s.deliveredQty %> </td>   
-            <td><%= s.unitPrice %></td>           
-          </tr>
-            <% i= i+1 %>
-        <% } %>    
       <% }) %> 
     </table>
   </div>

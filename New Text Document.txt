@@ -1,0 +1,161 @@
+// Print Do Route lib=html-pdf 
+router.get('/:id/print', async (req, res) => {
+  try {
+    const dos = await DO.find() 
+    const doL = await DO.findById(req.params.id)
+    const customer = await Customer.findById(doL.customer.toString()).exec()
+    const fabs = await SalesOrder.find()    
+    const wb = new ExcelJS.Workbook();
+    const fileName = 'atfDO.xlsx';
+
+    let d = doL.date.toISOString().replace(/T.*/,'').split('-').reverse().join('-');
+    
+    wb.xlsx.readFile(fileName).then(() => {    
+      const ws = wb.getWorksheet('Sheet1');  
+      ws.getCell('C12').value = customer.name;
+      ws.getCell('C13').value = customer.pic;
+      ws.getCell('C14').value = customer.address;
+      ws.getCell('C16').value = customer.phone;
+      ws.getCell('J8').value = doL.doNo;
+      ws.getCell('J12').value = d;
+      ws.getCell('J13').value = doL.poNumber;
+      ws.getCell('J14').value = doL.soNumber;
+      ws.getCell('J15').value = customer.terms;
+
+      let cnt = 20;
+      let strCnt ='';
+    
+      dos.forEach( ddo => {         
+        strCnt = cnt.toString();
+        if (doL.doNo === ddo.doNo) {
+          ws.getCell('B' + strCnt).value = ddo.deliverQty;
+          fabs.forEach (fab => {
+         
+            if (fab.barcode === ddo.barcode ){
+              ws.getCell('C' + strCnt).value = fab.description;
+            }
+        
+          })
+          cnt++;  
+        } 
+       }) 
+      
+      writeFile(wb);
+      let pdfFile = path.join(__dirname, "../output.pdf")
+      console.log(pdfFile);      
+
+      genPdf(pdfFile,res);
+      
+      /* fs.readFile(pdfFile,function(error,data){
+        if(error){
+                res.json({'status':'error',msg:err});
+        }else{                                               
+                res.writeHead(200, {"Content-Type": "application/pdf"  });
+                res.write(data);
+                res.end();       
+              } 
+});*/
+      //res.redirect('/');
+  
+  }).catch(err => {
+      console.log(err.message);
+  });
+
+
+
+async function writeFile(wb) {
+  await wb.xlsx.writeFile(fileName1);
+}
+
+function genPdf (pdfName,res){
+  // Create a document
+const doc = new PDFDocument();
+
+//doc.pipe(fs.createWriteStream(pdfName + '.pdf'));
+doc.pipe(fs.createWriteStream(pdfName));
+
+// Add an image, constrain it to a given size, and center it vertically and horizontally
+// Fit the image within the dimensions
+doc.image('atf-logo.png', 50, 15, {fit: [100, 100]})   
+   .stroke()
+   .fontSize(15)
+   .text('AUTOFILL MANUFACTURING SDN BHD',150,15)
+   .fontSize(10)
+   .text('Co Rgn no.503130-X       SST NO. J12-1808-21019559 ',150,40)
+   .text('No. 10 Jalan 3, Taman Perindustrian Sinaran,',150,40+12)
+   .text('Jalan Mersing, 86000 Kluang,Johor.',150,40+(12*2))
+   .text('Tel: 07-7877167',150,40+(12*3))
+   
+   // top line 
+   .lineWidth(35)
+   .moveTo(35,126)
+   .lineTo(550,126)
+   .moveTo(35,126.5)
+   .lineTo(550,126.5)
+   
+   .text('DO. No.',400, 110)
+   
+   // company etc
+   .fontSize(9)
+   .rect(35, 141 , 350, 90)  // x,y,w,h 
+   .text('Name',38, 151)  // x,y
+   .text('Attn',38, 151+12)
+   .text('Address',38, 151+(12*2))
+   .text('Phone',38,151+(12*4))
+   .lineWidth(0.1)                
+   .moveTo(100,151+10)
+   .lineTo(100+270,161)
+   .moveTo(100,161+12)
+   .lineTo(370,161+12)
+   .moveTo(100,161+12*2)
+   .lineTo(370,161+12*2)
+   .moveTo(100,161+12*3)
+   .lineTo(370,161+12*3)
+   .moveTo(100,161+12*4)
+   .lineTo(370,161+12*4)
+   
+   // date etc
+   .rect(400,141, 150, 90)  
+   .text('Date',403, 151)  // x,y 
+   .text('PO No.',403, 151+12)  // x,y 
+   .text('Ref No.',403, 151+12*2)  // x,y 
+   .text('Terms',403, 151+12*3)  // x,y 
+   .moveTo(440,151+10)
+   .lineTo(440+95,150+10)
+   .moveTo(440,161+12)
+   .lineTo(440+95,161+12)
+   .moveTo(440,161+(12*2))
+   .lineTo(440+95,161+(12*2))
+   .moveTo(440,161+(12*3))
+   .lineTo(440+95,161+(12*3))
+
+    // data contents  
+    .rect(35,250, 515, 390)  
+    .moveTo(35,250+15)    // horizon line
+    .lineTo(550,250+15)
+    .moveTo(80,250)       // vertical line left
+    .lineTo(80,250+390)
+    .moveTo(400,250)      // vertical line right
+    .lineTo(400,250+390)
+    .fontSize(11)
+    .text('Qty',50, 254)  // x,y 
+    .text('Description',200, 254)  // x,y 
+    .text('REMARKS',450, 254)  // x,y 
+
+    // bottom
+    .moveTo(35,700)      // line left
+    .lineTo(35+100,700)
+    .moveTo(400,700)      // line Right
+    .lineTo(400+100,700)
+    .text('ISSUE BY',35+10, 703)  // x,y 
+    .text('RECEIVE BY',400+10, 703)  // x,y 
+    .stroke()
+    .pipe(res)
+    
+// Finalize PDF file
+doc.end() 
+}
+
+
+      
+

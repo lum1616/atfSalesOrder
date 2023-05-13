@@ -1,9 +1,19 @@
+<script>
+ function onchangeDropdown(value){
+  
+ console.log("dhfhd")
+ } 
+</script>
+
+
 <form action="" method="POST">
     <div class="form-row">    
       <div class="form-item">   
-        <select name="filter"  >
+        <select name="filter" onchange = "onchangeDropdown(this.value)" >
           <option label="Parts In Progress" value="Parts In Progress"></option>  
-          <option label="FAB Orders" value="FAB Orders" ></option>       
+          <option label="FAB Orders" value="FAB Orders" ></option>
+          <option label="DO List" value="DO List" ></option>
+          <option label="Description" value="Description" ></option>          
         </select>  
       </div>     
       <div class="form-item">

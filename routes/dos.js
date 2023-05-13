@@ -3,13 +3,132 @@ const router = express.Router()
 const SalesOrder = require('../models/salesOrder')
 const Customer = require('../models/customer')
 const DO = require('../models/do')
-const { Mongoose } = require('mongoose')
-const ejs = require('ejs')
 const path = require("path")
-const pdf = require("html-pdf")
+const PDFDocument = require('pdfkit')
 const fs =require('fs')
-const { jsPDF } = require('jspdf')
 const runNumber = require('../models/runNumber') 
+
+function genPdf (cust,dos,doL,fabs,res){
+  
+  let pdfFile = path.join(__dirname, "../output.pdf")
+  // Create a document
+  const doc = new PDFDocument();  
+  doc.pipe(fs.createWriteStream(pdfFile));
+
+  let d = doL.date.toISOString().replace(/T.*/,'').split('-').reverse().join('-');
+  let posX1 = 50+3;
+  let posX2 = 85;
+  let posY = 254+30;
+
+  // Add an image, constrain it to a given size, and center it vertically and horizontally
+  // Fit the image within the dimensions
+  doc.image('atf-logo.png', 50, 15, {fit: [100, 100]})   
+      .stroke()
+      .fontSize(15)
+      .text('AUTOFILL MANUFACTURING SDN BHD',150,15)
+      .fontSize(10)
+      .text('Co Rgn no.503130-X       SST NO. J12-1808-21019559 ',150,40)
+      .text('No. 10 Jalan 3, Taman Perindustrian Sinaran,',150,40+12)
+      .text('Jalan Mersing, 86000 Kluang,Johor.',150,40+(12*2))
+      .text('Tel: 07-7877167',150,40+(12*3))
+      
+      // top line 
+      .lineWidth(35)
+      .moveTo(35,126)
+      .lineTo(550,126)
+      .moveTo(35,126.5)
+      .lineTo(550,126.5)
+      
+      .text('DO. No.', 400, 110)
+      .text(doL.doNo, 440+12, 110)  // x,y
+      
+      // company etc
+      .fontSize(9)
+      .rect(35, 141 , 350, 90)  // x,y,w,h 
+      .text('Name',38, 151)  // x,y
+      .text('Attn',38, 151+12)
+      .text('Address',38, 151+(12*2))
+      .text('Phone',38,151+(12*4))
+      .lineWidth(0.1)                
+      .moveTo(100,151+10)
+      .lineTo(100+270,161)
+      .text(cust.name,100, 151)  // x,y
+      .moveTo(100,161+12)
+      .lineTo(370,161+12)
+      .text(cust.pic,100, 151+12)  // x,y
+      .moveTo(100,161+12*2)
+      .lineTo(370,161+12*2)
+      .text(cust.address,100, 151+12*2)  // x,y
+      .moveTo(100,161+12*3)
+      .lineTo(370,161+12*3)
+      .moveTo(100,161+12*4)
+      .lineTo(370,161+12*4)
+      .text(cust.phone,100, 151+12*4)  // x,y
+
+      // date etc
+      .rect(400,141, 150, 90)  
+      .text('Date',403, 151)  // x,y 
+      .text('PO No.',403, 151+12)  // x,y 
+      .text('Ref No.',403, 151+12*2)  // x,y 
+      .text('Terms',403, 151+12*3)  // x,y 
+
+      .moveTo(440,151+10)
+      .lineTo(440+95,150+10)
+      .text(d,440, 151)  // x,y
+
+      .moveTo(440,161+12)
+      .lineTo(440+95,161+12)
+      .text(doL.poNumber,440, 151+12)  // x,y
+
+      .moveTo(440,161+(12*2))
+      .lineTo(440+95,161+(12*2))
+      .text(doL.soNumber,440, 151+12*2)  // x,y
+
+      .moveTo(440,161+(12*3))
+      .lineTo(440+95,161+(12*3))
+      .text(cust.terms,440, 151+12*3)  // x,y
+
+      // data contents  
+      .rect(35,250, 515, 390)  
+      .moveTo(35,250+15)    // horizon line
+      .lineTo(550,250+15)
+      .moveTo(80,250)       // vertical line left
+      .lineTo(80,250+390)
+      .moveTo(400,250)      // vertical line right
+      .lineTo(400,250+390)
+      .fontSize(11)
+      .text('Qty',50, 254)  // x,y 
+      .text('Description',200, 254)  // x,y 
+      .text('REMARKS',450, 254)  // x,y 
+
+       
+
+      // bottom
+      .moveTo(35,700)      // line left
+      .lineTo(35+100,700)
+      .moveTo(400,700)      // line Right
+      .lineTo(400+100,700)
+      .text('ISSUE BY',35+10, 703)  // x,y 
+      .text('RECEIVE BY',400+10, 703)  // x,y 
+      .stroke()
+      .pipe(res)
+
+  dos.forEach( ddo => {    
+    if (doL.doNo === ddo.doNo) {
+      doc.text( ddo.deliverQty, posX1, posY)      // quantity 
+      fabs.forEach (fab => {
+        if (fab.barcode === ddo.barcode ){
+          doc.text(fab.description, posX2, posY)  // description         
+        }        
+      })          
+      posY += 13;            
+    } 
+    })    
+      
+    // Finalize PDF file
+    doc.end() 
+}
+
 
 // All DOs Route
 router.get('/', async (req, res) => {
@@ -136,51 +255,13 @@ router.get('/:id/add', async (req, res) => {
 
 // Print Do Route lib=html-pdf 
 router.get('/:id/print', async (req, res) => {
-  try {
+  try {     
     const dos = await DO.find() 
     const doL = await DO.findById(req.params.id)
-    const customer = await Customer.findById(doL.customer.toString()).exec()
-      
-    let pdfFile = 'C:/DO/' + doL.doNo + '.pdf'
-   
+    const cust = await Customer.findById(doL.customer.toString()).exec()
+    const fabs = await SalesOrder.find()
     
-    ejs.renderFile(path.join(__dirname, "../views/doTemplate.ejs"),
-     {dos, doL, customer},(err, data) => {
-                      if (err) {
-                        res.send(err);
-                      } else {
-                        let options = {
-                              "height": "11.25in",
-                              "width": "8.5in",
-                              "header": {
-                                  "height": "20mm",
-                              },
-                              "footer": {
-                                  "height": "20mm",
-                              },
-
-                          };
-                          pdf.create(data, options).toFile(pdfFile, function (err, data) {
-                              if (err) {
-                                  res.send(err);
-                              } else{
-
-                                  fs.readFile(pdfFile,function(error,data){
-                                          if(error){
-                                                  res.json({'status':'error',msg:err});
-                                          }else{                                               
-                                                  res.writeHead(200, {"Content-Type": "application/pdf"  });
-                                                  res.write(data);
-                                                  res.end();       
-                                                }
-                                  });
-                                }//else
-                          });
-
-                        }//else
-    })
-    //res.redirect('/')
-       
+    genPdf(cust,dos,doL,fabs,res);
   }
   catch {
           res.redirect('/')
@@ -229,6 +310,7 @@ router.put('/:id', async (req, res) => {
         _so.deliveredQty -= lastDeliver
         _so.deliveredQty += doN.deliverQty
         }
+        
       if (_so.deliveredQty >= _so.orderQty){
         _so.status = "done"
       }else{

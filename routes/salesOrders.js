@@ -161,7 +161,19 @@ router.put('/:id', async (req, res) => {
     salesOrder.quotationNo = req.body.quotationNo.trim()
     
     await salesOrder.save()
-    
+
+    // update quotation number
+    let sos = await SalesOrder.find()
+     sos.forEach( so => {
+        console.log(so.orderNumber)
+        if (so.orderNumber === req.body.orderNumber.trim()) {
+             so.quotationNo = salesOrder.quotationNo;  
+             so.save()                  
+             }            
+       }
+      
+       
+     )      
     
     
     res.redirect(`/salesOrders/${salesOrder.id}`)
