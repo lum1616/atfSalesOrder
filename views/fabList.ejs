@@ -6,6 +6,8 @@
      <tr>
        <th>No</th>
        <th>FAB Number</th>
+       <th>PO Number</th>
+       <th>Description</th>
        <th>Customer</th>
        <th>Date</th>       
                  
@@ -28,6 +30,8 @@
             <tr>
               <td><a class="btn-primary " href="/salesOrders/<%= s.id %>"><%= i %></a></td>
               <td><%= s.orderNumber %> </td>
+              <td><%= s.poNumber %> </td>
+              <td><%= s.desc_fab %> </td>              
               <td><%= name %></td>
               <td><%= s.date.toISOString().split('T')[0] %></td>
                       

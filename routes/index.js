@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
     if (title === "DO List"){
        res.render(`doList`, { dos: dos, cu : customers, title:title })
       }
-    if (title === "Description"){
+    if (title === "Part Description"){
         res.render(`descList`, { so: salesOrders, cu : customers, title:title })
        }
  

@@ -35,15 +35,26 @@ function genPdf (cust,dos,doL,fabs,res){
       // top line 
       .lineWidth(35)
       .moveTo(35,126)
-      .lineTo(550,126)
+      .lineTo(375,126)
       .moveTo(35,126.5)
+      .lineTo(375,126.5)
+
+      .moveTo(500,126)
+      .lineTo(550,126)
+      .moveTo(500,126.5)
       .lineTo(550,126.5)
-      
-      .text('DO. No.', 400, 110)
-      .text(doL.doNo, 440+12, 110)  // x,y
+
+      .fontSize(13)
+      .font('Times-Roman')      
+      .text('DELIVERY ORDER', 383, 120)
+
+
+      .fontSize(11)
+      //.text('DO. No.', 400, 100)
+      .text(doL.doNo, 440+25, 100)  // x,y
       
       // company etc
-      .fontSize(9)
+      .fontSize(10)
       .rect(35, 141 , 350, 90)  // x,y,w,h 
       .text('Name',38, 151)  // x,y
       .text('Attn',38, 151+12)
@@ -70,23 +81,30 @@ function genPdf (cust,dos,doL,fabs,res){
       .text('Date',403, 151)  // x,y 
       .text('PO No.',403, 151+12)  // x,y 
       .text('Ref No.',403, 151+12*2)  // x,y 
-      .text('Terms',403, 151+12*3)  // x,y 
+      .text('Quotation No.',403, 151+12*3)  // x,y 
+      .text('Terms',403, 151+12*4)  // x,y 
 
-      .moveTo(440,151+10)
-      .lineTo(440+95,150+10)
-      .text(d,440, 151)  // x,y
+      .moveTo(463,151+10)
+      .lineTo(463+80,150+10)
+      .text(d,463, 151)  // x,y
 
-      .moveTo(440,161+12)
-      .lineTo(440+95,161+12)
-      .text(doL.poNumber,440, 151+12)  // x,y
+      .moveTo(463,161+12)
+      .lineTo(463+80,161+12)
+      .text(doL.poNumber,463, 151+12)  // x,y
 
-      .moveTo(440,161+(12*2))
-      .lineTo(440+95,161+(12*2))
-      .text(doL.soNumber,440, 151+12*2)  // x,y
+      .moveTo(463,161+(12*2))
+      .lineTo(463+80,161+(12*2))
+      .text(doL.soNumber,463, 151+12*2)  // x,y
 
-      .moveTo(440,161+(12*3))
-      .lineTo(440+95,161+(12*3))
-      .text(cust.terms,440, 151+12*3)  // x,y
+      .moveTo(463,161+(12*3))
+      .lineTo(463+80,161+(12*3))
+      //.text(fabs.quotationNo,463, 151+12*3)  // x,y
+
+      .moveTo(463,161+(12*4))
+      .lineTo(463+80,161+(12*4))
+      .text(cust.terms,463, 151+12*4)  // x,y
+
+
 
       // data contents  
       .rect(35,250, 515, 390)  
@@ -100,7 +118,11 @@ function genPdf (cust,dos,doL,fabs,res){
       .text('Qty',50, 254)  // x,y 
       .text('Description',200, 254)  // x,y 
       .text('REMARKS',450, 254)  // x,y 
-
+      
+      .text('Dwg No.',300, 254+13,)  // x,y 
+      .moveTo(300,267+12)      // vertical line right
+      .lineTo(300+42,267+12)
+      
        
 
       // bottom
@@ -118,7 +140,11 @@ function genPdf (cust,dos,doL,fabs,res){
       doc.text( ddo.deliverQty, posX1, posY)      // quantity 
       fabs.forEach (fab => {
         if (fab.barcode === ddo.barcode ){
-          doc.text(fab.description, posX2, posY)  // description         
+          doc.fontSize(11)
+          doc.text(fab.description, posX2, posY)  // description 
+          doc.text(fab.drawingNo, 300, posY)  // description 
+          doc.fontSize(10)
+          doc.text(fab.quotationNo,463, 151+12*3)  // x,y       
         }        
       })          
       posY += 13;            
@@ -260,6 +286,7 @@ router.get('/:id/print', async (req, res) => {
     const doL = await DO.findById(req.params.id)
     const cust = await Customer.findById(doL.customer.toString()).exec()
     const fabs = await SalesOrder.find()
+   
     
     genPdf(cust,dos,doL,fabs,res);
   }

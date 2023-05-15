@@ -48,6 +48,12 @@ const salesOrderSchema = new mongoose.Schema({
   description: {
     type: String    
     },
+
+  desc_fab: {
+    type: String    
+    },
+  
+
   status: {
     type: String    
     },

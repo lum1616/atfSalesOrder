@@ -58,11 +58,13 @@ router.post('/', async (req, res) => {
     customer: req.body.customer,
     quotationNo: req.body.quotationNo.trim(),
     barcode: req.body.barcode.trim(),
+    desc_fab: req.body.desc_fab.trim(),
     status : "",
     unitPrice : 1,
     deliveredQty : 0,    
     orderQty : 1
   })
+  console.log(salesOrder);
   
   const fabNumber = await runNumber.findOne({code : "FAB"})
   fabNumber.counter++ 
