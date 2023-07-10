@@ -64,7 +64,7 @@ router.post('/', async (req, res) => {
     deliveredQty : 0,    
     orderQty : 1
   })
-  console.log(salesOrder);
+  
   
   const fabNumber = await runNumber.findOne({code : "FAB"})
   fabNumber.counter++ 
@@ -167,7 +167,7 @@ router.put('/:id', async (req, res) => {
     // update quotation number
     let sos = await SalesOrder.find()
      sos.forEach( so => {
-        console.log(so.orderNumber)
+        //console.log(so.orderNumber)
         if (so.orderNumber === req.body.orderNumber.trim()) {
              so.quotationNo = salesOrder.quotationNo;  
              so.save()                  

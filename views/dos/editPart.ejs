@@ -1,9 +1,12 @@
-<script>  
-  function myFunction(idx) {     
+<script> 
+
+
+  function myFunction(idx) { 
+    //alert("change"+idx)    
     document.getElementById("deliveredQty").selectedIndex = idx   
-    document.getElementById("orderQty").selectedIndex = idx
+    document.getElementById("orderQty").selectedIndex = idx    
   }
-</script>
+    </script>
 
 <h2 class="page-header">DO <%= form %> Part</h2>
 
@@ -37,21 +40,28 @@
 
   <div class="form-row">
     <div class="form-item">
-      <label>Barcode</label>           
+
+      <label>Scan Barcode</label> 
+      <input type="text" id="barcodeS" name="barcodeS" >
+    </div> 
+      <div class="form-item">
+      <label>Select Barcode</label>           
       <select id="barcode"   name="soId" onchange="myFunction(this.selectedIndex)"> 
         <% salesOrders.forEach(so => { %>  
           <% if (doL.customer.toString() === so.customer.toString() ) {%>
             
             <% if (doL.barcode === so.barcode ) {%>
               <option selected label="<%= so.barcode %>" value="<%= so.id %>" > </option>   
-            <% } else { %>          
+              <% } else { %>          
                   <option label="<%= so.barcode %>" value="<%= so.id %>"> </option>   
                 <% } %>
           <% } %>
         <% }) %>        
       </select>
     </div>
+  </div>
 
+    <div class="form-row">
     <div class="form-item">
       <label>Order Qty</label> 
       <select name="" id="orderQty">

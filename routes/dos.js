@@ -6,14 +6,91 @@ const DO = require('../models/do')
 const path = require("path")
 const PDFDocument = require('pdfkit')
 const fs =require('fs')
-const runNumber = require('../models/runNumber') 
+const runNumber = require('../models/runNumber')
+const ExcelJS = require('exceljs')
+const wb = new ExcelJS.Workbook()
+
+
+function genExcel(cust,dos,doL,fabs,res) {
+  
+  let d = doL.date.toISOString().replace(/T.*/,'').split('-').reverse().join('-');
+  let fileName = 'atfDO.xlsx'
+  
+
+  wb.xlsx.readFile(fileName).then(() => {
+
+    const ws = wb.getWorksheet('Sheet1');
+
+    ws.getCell('C12').value = cust.name
+    ws.getCell('C13').value = cust.pic
+    ws.getCell('C14').value = cust.address
+    ws.getCell('C16').value = cust.phone
+    
+    ws.getCell('J8').value = doL.doNo
+    ws.getCell('J12').value = d
+    ws.getCell('J13').value = doL.poNumber
+    ws.getCell('J14').value = doL.soNumber
+    ws.getCell('J16').value = cust.terms 
+    ws.getCell('F20').value = 'Draw No' 
+     
+    let cnt = 21
+    let strCnt =''
+    let fName = doL.doNo  
+    
+    dos.forEach( ddo => {
+      
+      strCnt = cnt.toString() 
+      
+      if (doL.doNo === ddo.doNo) {
+        ws.getCell('B'+ strCnt ).value  = ddo.deliverQty    // quantity 
+        fabs.forEach (fab => {
+          if (fab.barcode === ddo.barcode ){
+            
+            ws.getCell('C' +  strCnt).value  = fab.description  // description 
+            ws.getCell('F' + strCnt).value  = fab.drawingNo  // drawing No 
+            ws.getCell('J15' ).value = fab.quotationNo
+          }        
+        })          
+      }
+      cnt++
+
+      })    
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+     
+      res.setHeader('Content-disposition', 'attachment; filename='+ fName +'.xlsx');
+      wb.xlsx.write(res)
+
+     /*  wb.xlsx
+
+         .writeFile( doL.doNo + '.xlsx')
+         .then(() => {
+              console.log('Done.');
+              })
+         .catch(err => {
+             console.log(err.message);
+    }); */
+    
+})
+
+.catch(err => {
+    console.log(err.message);
+});
+}
+
+
 
 function genPdf (cust,dos,doL,fabs,res){
+
+  let name = doL.doNo + ".pdf"
+  //let fName = doL.doNo
   
-  let pdfFile = path.join(__dirname, "../output.pdf")
+  //let pdfFile = path.join(__dirname, "../output.pdf")
+  let pdfFile = path.join(__dirname, "../"+ name)
+
   // Create a document
   const doc = new PDFDocument();  
-  doc.pipe(fs.createWriteStream(pdfFile));
+  //doc.pipe(fs.createWriteStream(pdfFile));
 
   let d = doL.date.toISOString().replace(/T.*/,'').split('-').reverse().join('-');
   let posX1 = 50+3;
@@ -133,7 +210,7 @@ function genPdf (cust,dos,doL,fabs,res){
       .text('ISSUE BY',35+10, 703)  // x,y 
       .text('RECEIVE BY',400+10, 703)  // x,y 
       .stroke()
-      .pipe(res)
+      //.pipe(res)  // write to pdf
 
   dos.forEach( ddo => {    
     if (doL.doNo === ddo.doNo) {
@@ -153,6 +230,13 @@ function genPdf (cust,dos,doL,fabs,res){
       
     // Finalize PDF file
     doc.end() 
+
+    //res.setHeader('Content-disposition', 'inline; filename='+ fName +'.pdf');
+    res.setHeader('Content-disposition', 'attachment; filename='+ name);
+    doc.pipe(res)
+    
+   
+    
 }
 
 
@@ -184,7 +268,7 @@ router.get('/newDO', async (req, res) => {
  
    if (doNumber == null){
      doNumber = new runNumber()
-     doNumber.code = "DO"
+     doNumber.code = "DO"     
      doNumber.counter = 0
      await doNumber.save()
      doNumber.counter++ 
@@ -192,7 +276,7 @@ router.get('/newDO', async (req, res) => {
      doNumber.counter++     
    }
     
-   IptDONo = await getRunNo("DO")
+   IptDONo = await getRunNo("F")
    
   const params = {
     dos: dos,
@@ -279,21 +363,51 @@ router.get('/:id/add', async (req, res) => {
   }
 })
 
-// Print Do Route lib=html-pdf 
-router.get('/:id/print', async (req, res) => {
+// Print PDF Do 
+router.get('/:id/printPdf', async (req, res) => {
   try {     
     const dos = await DO.find() 
     const doL = await DO.findById(req.params.id)
     const cust = await Customer.findById(doL.customer.toString()).exec()
     const fabs = await SalesOrder.find()
    
-    
-    genPdf(cust,dos,doL,fabs,res);
+    let fName = doL.doNo
+   
+   
+      genPdf(cust,dos,doL,fabs,res);
+      //res.setHeader('Content-disposition', 'inline; filename='+ fName +'.pdf');
+   
+   
   }
   catch {
           res.redirect('/')
         }
 })
+
+// Print PDF Do 
+router.get('/:id/printExcel', async (req, res) => {
+  try {    
+  
+    const dos = await DO.find() 
+    const doL = await DO.findById(req.params.id)
+    const cust = await Customer.findById(doL.customer.toString()).exec()
+    const fabs = await SalesOrder.find()
+   
+   
+   
+      genExcel(cust,dos,doL,fabs,res); 
+             
+   
+  }
+  catch {
+          res.redirect('/')
+        }
+})
+
+
+
+
+
 
 
 // update (save) do Part Route
@@ -325,6 +439,11 @@ router.put('/:id', async (req, res) => {
     doN.drawingNo = so.drawingNo
     doN.deliverQty = req.body.deliverQty
     doN.barcode = so.barcode
+     
+    if (req.body.barcodeS != ""){
+      doN.barcode = req.body.barcodeS      
+    }
+     
 
     // update do and salesorder status and delivered quantity
     let _so = await SalesOrder.findOne({barcode: [doN.barcode]})
@@ -446,7 +565,8 @@ async function getRunNo(Code){
   let year = d.getFullYear().toString()
   let strCnt = _runNumber.counter.toString().padStart(6, '0')
 
-  return _runNumber.code + "-" + year.substring(2) + "-" + strCnt 
+  //return _runNumber.code + "-" + year.substring(2) + "-" + strCnt 
+  return _runNumber.code + year.substring(2) + "-" + strCnt 
   
 }
 
